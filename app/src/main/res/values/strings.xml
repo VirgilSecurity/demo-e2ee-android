@@ -1,0 +1,24 @@
+<resources>
+
+    <string name="app_name">JwtWorkExample</string>
+
+    <!-- General -->
+    <string name="no_internet">Please, check your internet state</string>
+    <string name="error_loading">Please, swipe from top to retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="press_exit_once_more">Press back once more to exit</string>
+
+    <!-- Threads List -->
+    <string name="threads_list_name">Threads List</string>
+    <string name="no_threads">No conversations yet. Check if service is fine.</string>
+
+    <!-- Thread -->
+    <string name="enter_your_message">Enter your message</string>
+    <string name="send">Send</string>
+    <string name="no_messages">No messages yet.\nBut You can fix it (:</string>
+
+    <!-- Drawer -->
+    <string name="log_out">Log out</string>
+
+</resources>
