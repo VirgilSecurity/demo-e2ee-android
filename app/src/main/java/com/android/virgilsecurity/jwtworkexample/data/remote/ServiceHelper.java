@@ -1,5 +1,6 @@
 package com.android.virgilsecurity.jwtworkexample.data.remote;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.TokenResponse;
 import com.android.virgilsecurity.jwtworkexample.data.model.UsersRepsonse;
 
 import io.reactivex.Single;
@@ -20,5 +21,9 @@ public class ServiceHelper {
 
     public Single<UsersRepsonse> getUsers() {
         return service.getUsers();
+    }
+
+    public Single<TokenResponse> getToken(String googleToken) {
+        return service.getToken(googleToken);
     }
 }
