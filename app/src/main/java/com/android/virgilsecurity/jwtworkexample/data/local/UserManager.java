@@ -1,5 +1,7 @@
 package com.android.virgilsecurity.jwtworkexample.data.local;
 
+import android.content.Context;
+
 import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.google.gson.Gson;
 
@@ -8,17 +10,21 @@ import com.google.gson.Gson;
  * -__o
  */
 
-public class UserManager {
+public class UserManager extends PropertyManager {
 
-    public static final String CURRENT_USER = "CURRENT_USER";
+    private static final String CURRENT_USER = "CURRENT_USER";
 
-    public static void setCurrentUser(User user) {
-        PropertyManager.setValue(CURRENT_USER, new Gson().toJson(user));
+    public UserManager(Context context) {
+        super(context);
     }
 
-    public static User getCurrentUser() {
-        return PropertyManager.getValue(CURRENT_USER,
-                                        PropertyManager.SupportedTypes.STRING,
-                                        null);
+    public void setCurrentUser(User user) {
+        setValue(CURRENT_USER, new Gson().toJson(user));
+    }
+
+    public User getCurrentUser() {
+        return getValue(CURRENT_USER,
+                        PropertyManager.SupportedTypes.STRING,
+                        null);
     }
 }

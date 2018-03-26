@@ -10,7 +10,7 @@ import android.view.Gravity;
 import android.widget.TextView;
 
 import com.android.virgilsecurity.jwtworkexample.R;
-import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
+import com.android.virgilsecurity.jwtworkexample.data.local.PropertyManager;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseActivity;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.thread.ThreadFragment;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.threadList.ThreadsListFragment;
@@ -22,7 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import butterknife.BindView;
-import butterknife.internal.Utils;
 
 /**
  * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
@@ -94,8 +93,8 @@ public class ChatControlActivity extends BaseActivity {
         TextView tvUsernameDrawer =
                 nvNavigation.getHeaderView(0)
                             .findViewById(R.id.tvUsernameDrawer);
-        tvUsernameDrawer.setText(UserManager.getCurrentUser()
-                                            .getEmailPrefix());
+        tvUsernameDrawer.setText(PropertyManager.UserManager.getCurrentUser()
+                                                            .getEmailPrefix());
 
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);

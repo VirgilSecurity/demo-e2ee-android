@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringDef;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.User;
+import com.google.gson.Gson;
+
 /**
  * Created by Danylo Oliinyk on 3/23/18 at Virgil Security.
  * -__o
@@ -27,20 +30,18 @@ public class PropertyManager {
 
     private static SharedPreferences preferences;
 
-    public static void initialize(Context context) {
+    public PropertyManager(Context context) {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    private PropertyManager(Context context) {
-    }
-
-    private static void edit(Performer<SharedPreferences.Editor> performer) {
+    private void edit(Performer<SharedPreferences.Editor> performer) {
         SharedPreferences.Editor editor = preferences.edit();
         performer.performOperation(editor);
         editor.apply();
     }
 
-    public static <T> void setValue(String key, T value) {
+    public <T> void setValue(String key, T value) {
+
         if (value instanceof String) {
             edit((editor) -> editor.putString(key, (String) value));
         } else if (value instanceof Boolean) {
@@ -54,7 +55,8 @@ public class PropertyManager {
         }
     }
 
-    public static <T> T getValue(String key, @SupportedTypes String type, T defaultValue) {
+    public <T> T getValue(String key, @SupportedTypes String type, T defaultValue) {
+
         Object value;
         if (type.equals(SupportedTypes.STRING)) {
             value = preferences.getString(key, (String) defaultValue);

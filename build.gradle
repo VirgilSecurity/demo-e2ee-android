@@ -29,6 +29,7 @@ allprojects {
         networkTracker = "0.12.2"
         dagger = "2.13"
         loggingInterceptor = "3.10.0"
+        rxWebSockets = "5.0.0"
     }
 
     repositories {
@@ -36,6 +37,9 @@ allprojects {
         jcenter()
         maven {
             url 'https://maven.google.com/'
+        }
+        maven {
+            url 'https://jitpack.io'
         }
     }
 }

@@ -1,7 +1,11 @@
 package com.android.virgilsecurity.jwtworkexample.di;
 
+import com.android.virgilsecurity.jwtworkexample.data.local.PropertyManager;
+import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
+import com.android.virgilsecurity.jwtworkexample.data.remote.RxServiceHelper;
+import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
+import com.android.virgilsecurity.jwtworkexample.data.virgil.GetTokenCallbackImpl;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivityComponent;
-import com.android.virgilsecurity.jwtworkexample.ui.login.LogInActivityComponent;
 import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.PrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
@@ -34,8 +38,17 @@ public class VirgilModule {
         return new VirgilCardCrypto();
     }
 
-    @Provides @Singleton static AccessTokenProvider provideAccessTokenProvider() {
-        return new CallbackJwtProvider();
+    @Provides @Singleton static CallbackJwtProvider.GetTokenCallback provideGetTokenCallback(
+            ServiceHelper serviceHelper,
+            UserManager userManager) {
+
+        return new GetTokenCallbackImpl(serviceHelper, userManager.getCurrentUser());
+    }
+
+    @Provides @Singleton static AccessTokenProvider provideAccessTokenProvider(
+            CallbackJwtProvider.GetTokenCallback getTokenCallback) {
+
+        return new CallbackJwtProvider(getTokenCallback);
     }
 
     @Provides @Singleton static PrivateKeyExporter providePrivateKeyExporter() {
@@ -46,8 +59,10 @@ public class VirgilModule {
         return new JsonFileKeyStorage();
     }
 
-    @Provides @Singleton static PrivateKeyStorage providePrivateKeyStorage(PrivateKeyExporter privateKeyExporter,
-                                                                           KeyStorage keyStorage) {
+    @Provides @Singleton static PrivateKeyStorage providePrivateKeyStorage(
+            PrivateKeyExporter privateKeyExporter,
+            KeyStorage keyStorage) {
+
         return new PrivateKeyStorage(privateKeyExporter, keyStorage);
     }
 }

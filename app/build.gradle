@@ -61,4 +61,7 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
+
+    // RxWebSockets
+    implementation "com.github.jacek-marchwicki:JavaWebsocketClient:$rxWebSockets"
 }

@@ -1,13 +1,9 @@
 package com.android.virgilsecurity.jwtworkexample.data.remote;
 
 import com.android.virgilsecurity.jwtworkexample.data.model.TokenResponse;
-import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.android.virgilsecurity.jwtworkexample.data.model.UsersRepsonse;
 
-import java.util.List;
-
 import io.reactivex.Single;
-import retrofit2.Call;
 import retrofit2.Retrofit;
 
 /**
@@ -15,15 +11,19 @@ import retrofit2.Retrofit;
  * -__o
  */
 
-public class ServiceHelper {
+public class RxServiceHelper {
 
     private JwtExampleService service;
 
-    public ServiceHelper(Retrofit retrofit) {
+    public RxServiceHelper(Retrofit retrofit) {
         this.service = retrofit.create(JwtExampleService.class);
     }
 
-    public Call<TokenResponse> getToken(String googleToken) {
-        return service.getToken(googleToken);
+    public Single<UsersRepsonse> getUsers() {
+        return service.getUsersRx();
+    }
+
+    public Single<TokenResponse> getToken(String googleToken) {
+        return service.getTokenRx(googleToken);
     }
 }
