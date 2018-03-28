@@ -152,7 +152,12 @@ public class ChatControlActivity extends BaseActivity {
             switch (item.getItemId()) {
                 case R.id.itemLogOut:
                     dlDrawer.closeDrawer(Gravity.START);
+
                     showBaseLoading(true);
+
+                    userManager.clearCurrentUser();
+                    userManager.clearUserCard();
+
                     threadFragment.disposeAll();
                     threadsListFragment.disposeAll();
                     LogInActivity.startClearTop(this);

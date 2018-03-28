@@ -73,22 +73,22 @@ public class PropertyManager {
         editor.apply();
     }
 
-    public <T> void setValue(String key, T value) {
+    <T> void setValue(String key, T value) {
 
         if (value instanceof String) {
-            edit((editor) -> editor.putString(key, (String) value));
+            edit(editor -> editor.putString(key, (String) value));
         } else if (value instanceof Boolean) {
-            edit((editor) -> editor.putBoolean(key, (Boolean) value));
+            edit(editor -> editor.putBoolean(key, (Boolean) value));
         } else if (value instanceof Integer) {
-            edit((editor) -> editor.putInt(key, (Integer) value));
+            edit(editor -> editor.putInt(key, (Integer) value));
         } else if (value instanceof Float) {
-            edit((editor) -> editor.putFloat(key, (Float) value));
+            edit(editor -> editor.putFloat(key, (Float) value));
         } else {
             throw new UnsupportedOperationException("Not yet implemented.");
         }
     }
 
-    public <T> T getValue(String key, @SupportedTypes String type, T defaultValue) {
+    <T> T getValue(String key, @SupportedTypes String type, T defaultValue) {
 
         Object value;
         if (type.equals(SupportedTypes.STRING)) {
@@ -103,6 +103,10 @@ public class PropertyManager {
             throw new UnsupportedOperationException("Not yet implemented.");
         }
         return (T) value;
+    }
+
+    void clearValue(String key) {
+        edit(editor -> editor.remove(key));
     }
 
     public interface Performer<T> {

@@ -33,10 +33,22 @@
 
 package com.android.virgilsecurity.jwtworkexample.data.virgil;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.exception.KeyGenerationException;
+import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardManager;
+import com.virgilsecurity.sdk.cards.model.RawCardContent;
+import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.cards.validation.CardVerifier;
+import com.virgilsecurity.sdk.client.exceptions.VirgilServiceException;
 import com.virgilsecurity.sdk.crypto.CardCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilCrypto;
+import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
+import com.virgilsecurity.sdk.storage.PrivateKeyStorage;
+
+import java.util.List;
 
 /**
  * Created by Danylo Oliinyk on 3/23/18 at Virgil Security.
@@ -50,17 +62,47 @@ public class VirgilHelper {
     public VirgilHelper(InitCardCrypto initCardCrypto,
                         InitAccessTokenProvider initAccessTokenProvider,
                         InitCardVerifier initCardVerifier) {
+
         cardManager = initCardManager(initCardCrypto, initAccessTokenProvider, initCardVerifier);
     }
 
     private CardManager initCardManager(InitCardCrypto initCardCrypto,
-                                 InitAccessTokenProvider initAccessTokenProvider,
-                                 InitCardVerifier initCardVerifier) {
+                                        InitAccessTokenProvider initAccessTokenProvider,
+                                        InitCardVerifier initCardVerifier) {
         return new CardManager.Builder()
                 .setCrypto(initCardCrypto.initialize())
                 .setAccessTokenProvider(initAccessTokenProvider.initialize())
                 .setCardVerifier(initCardVerifier.initialize())
                 .build();
+    }
+
+    public Card publishCard(String identity) throws CryptoException, VirgilServiceException {
+        VirgilKeyPair keyPair = generateKeyPair();
+        RawSignedModel cardModel = cardManager.generateRawCard(keyPair.getPrivateKey(),
+                                                               keyPair.getPublicKey(),
+                                                               identity);
+        return cardManager.publishCard(cardModel);
+    }
+
+    public Card getCard(String cardId) throws CryptoException, VirgilServiceException {
+        return cardManager.getCard(cardId);
+    }
+
+    public List<Card> searchCards(String identity) throws CryptoException, VirgilServiceException {
+        return cardManager.searchCards(identity);
+    }
+
+    public VirgilKeyPair generateKeyPair() {
+        try {
+            return getVirgilCrypto().generateKeys();
+        } catch (CryptoException e) {
+            e.printStackTrace();
+            throw new KeyGenerationException(e);
+        }
+    }
+
+    public VirgilCrypto getVirgilCrypto() {
+        return ((VirgilCardCrypto) cardManager.getCrypto()).getVirgilCrypto();
     }
 
     public CardManager getCardManager() {

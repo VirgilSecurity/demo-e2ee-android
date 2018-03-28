@@ -33,10 +33,62 @@
 
 package com.android.virgilsecurity.jwtworkexample.data.virgil;
 
+import com.virgilsecurity.sdk.cards.Card;
+import com.virgilsecurity.sdk.cards.model.RawSignedModel;
+import com.virgilsecurity.sdk.client.exceptions.VirgilServiceException;
+import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+
+import java.util.List;
+
+import io.reactivex.Single;
+
 /**
  * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
  * -__o
  */
 
 public class VirgilRx {
+
+    private final VirgilHelper virgilHelper;
+
+    public VirgilRx(VirgilHelper virgilHelper) {
+        this.virgilHelper = virgilHelper;
+    }
+
+    public Single<Card> publishCard(String identity) {
+        return Single.create(e -> {
+            try {
+                e.onSuccess(virgilHelper.publishCard(identity));
+            } catch (CryptoException | VirgilServiceException exception) {
+                exception.printStackTrace();
+                e.onError(exception);
+            }
+        });
+    }
+
+    public Single<Card> getCard(String cardId) {
+        return Single.create(e -> {
+            try {
+                e.onSuccess(virgilHelper.getCard(cardId));
+            } catch (CryptoException | VirgilServiceException exception) {
+                exception.printStackTrace();
+                e.onError(exception);
+            }
+        });
+    }
+
+    public Single<List<Card>> searchCards(String identity) {
+        return Single.create(e -> {
+            try {
+                e.onSuccess(virgilHelper.searchCards(identity));
+            } catch (CryptoException | VirgilServiceException exception) {
+                exception.printStackTrace();
+                e.onError(exception);
+            }
+        });
+    }
+
+    public VirgilHelper getVirgilHelper() {
+        return virgilHelper;
+    }
 }

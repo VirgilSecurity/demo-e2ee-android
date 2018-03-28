@@ -84,7 +84,7 @@ public class LogInActivity extends BaseActivityDi implements HasFragmentInjector
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
         if (account != null)
-            startChatControlActivity(account.ge);
+            startChatControlActivity(userManager.getCurrentUser().getEmailPrefix());
 
         UiUtils.replaceFragmentNoTag(getFragmentManager(),
                                      R.id.flBaseContainer,

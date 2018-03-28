@@ -36,10 +36,12 @@ package com.android.virgilsecurity.jwtworkexample.ui.login;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.android.virgilsecurity.jwtworkexample.R;
+import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
+import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
+import com.android.virgilsecurity.jwtworkexample.util.ErrorResolver;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -48,6 +50,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.virgilsecurity.sdk.cards.Card;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -58,13 +63,19 @@ import butterknife.BindView;
  * -__o
  */
 
-public class LogInFragment extends BaseFragmentDi<LogInActivity> {
+public final class LogInFragment
+        extends BaseFragmentDi<LogInActivity>
+        implements LogInVirgilInteractor, LogInKeyStorageInteractor {
 
     private static final int RC_SIGN_IN = 42;
 
+    private GoogleSignInClient googleSignInClient;
+    @Inject protected LogInPresenter presenter;
+    @Inject protected UserManager userManager;
+    @Inject protected ErrorResolver errorResolver;
+
     @BindView(R.id.signInButton)
     protected SignInButton signInButton;
-    private GoogleSignInClient mGoogleSignInClient;
 
     public static LogInFragment newInstance() {
 
@@ -88,10 +99,10 @@ public class LogInFragment extends BaseFragmentDi<LogInActivity> {
                 .requestEmail()
                 .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
+        googleSignInClient = GoogleSignIn.getClient(activity, gso);
 
         signInButton.setOnClickListener(v -> {
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            Intent signInIntent = googleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         });
     }
@@ -100,10 +111,7 @@ public class LogInFragment extends BaseFragmentDi<LogInActivity> {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             @SuppressLint("RestrictedApi")
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
@@ -115,10 +123,52 @@ public class LogInFragment extends BaseFragmentDi<LogInActivity> {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
             UiUtils.toast(this, "Signed In as " + account.getDisplayName());
-            activity.startChatControlActivity();
+            User user = new User(account.getEmail());
+            userManager.setCurrentUser(user);
+            presenter.requestSearchCards(user.getEmailPrefix());
         } catch (ApiException ignored) {
             UiUtils.toast(this, "Error\nCode: " + ignored.getStatusCode()
-            + "\nMessage: " + ignored.getMessage());
+                    + "\nMessage: " + ignored.getMessage());
         }
+    }
+
+    @Override public void onSearchCardSuccess(List<Card> cards) {
+        if (cards.size() > 1) {
+            presenter.disposeAll();
+            UiUtils.toast(this, R.string.multiply_cards);
+        }
+
+        presenter.requestIfKeyExists(cards.get(0).getIdentity());
+    }
+
+    @SuppressLint("RestrictedApi") @Override public void onSearchCardError(Throwable t) {
+        String error = errorResolver.resolve(t, resolvedError -> null); // If we can't resolve error here -
+                                                                        // then it's normal behaviour. Proceed.
+        if (error != null) {
+            UiUtils.toast(this, error);
+            googleSignInClient.signOut();
+        }
+
+        presenter.requestPublishCard(userManager.getCurrentUser().getEmailPrefix());
+    }
+
+    @Override public void onPublishCardSuccess(Card card) {
+        userManager.setUserCard(card);
+        activity.startChatControlActivity(userManager.getCurrentUser().getEmailPrefix());
+    }
+
+    @Override public void onPublishCardError(Throwable t) {
+        UiUtils.toast(this, errorResolver.resolve(t));
+    }
+
+    @Override public void onKeyExists() {
+        activity.startChatControlActivity(userManager.getCurrentUser().getEmailPrefix());
+    }
+
+    @Override public void onKeyNotExists() {
+        presenter.disposeAll();
+        UiUtils.toast(this, R.string.no_private_key); // TODO: 3/28/18 add dialog with explanation that
+                                                               //               user can sign in again but won't
+                                                               //               be able to decrypt old messages
     }
 }

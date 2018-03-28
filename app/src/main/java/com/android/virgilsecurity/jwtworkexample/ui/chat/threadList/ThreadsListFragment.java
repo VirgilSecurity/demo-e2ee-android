@@ -35,12 +35,25 @@ package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
 
 import android.app.Fragment;
 
+import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
+import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
+
 /**
  * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
  * -__o
  */
 
-public class ThreadsListFragment extends Fragment {
+public class ThreadsListFragment extends BaseFragmentDi<ChatControlActivity> {
+
+
+    @Override protected int getLayout() {
+        return 0;
+    }
+
+    @Override protected void postButterInit() {
+
+    }
+
     public void disposeAll() {
 
     }

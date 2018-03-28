@@ -33,9 +33,19 @@
 
 package com.android.virgilsecurity.jwtworkexample.ui.login;
 
+import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilRx;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BasePresenter;
+import com.virgilsecurity.sdk.cards.Card;
+import com.virgilsecurity.sdk.cards.model.RawSignedModel;
+import com.virgilsecurity.sdk.storage.PrivateKeyStorage;
+
+import java.util.List;
+
+import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiConsumer;
 import retrofit2.Retrofit;
 
 /**
@@ -46,8 +56,53 @@ import retrofit2.Retrofit;
 public class LogInPresenter implements BasePresenter {
 
     private CompositeDisposable compositeDisposable;
+    private LogInVirgilInteractor logInVirgilInteractor;
+    private LogInKeyStorageInteractor logInKeyStorageInteractor;
+    private VirgilRx virgilRx;
+    private PrivateKeyStorage privateKeyStorage;
 
-    public LogInPresenter() {
+    @Inject
+    public LogInPresenter(VirgilRx virgilRx,
+                          PrivateKeyStorage privateKeyStorage,
+                          LogInVirgilInteractor logInVirgilInteractor,
+                          LogInKeyStorageInteractor logInKeyStorageInteractor) {
+        this.virgilRx = virgilRx;
+        this.privateKeyStorage = privateKeyStorage;
+        this.logInVirgilInteractor = logInVirgilInteractor;
+        this.logInKeyStorageInteractor = logInKeyStorageInteractor;
+    }
+
+    public void requestSearchCards(String identity) {
+        Disposable searchCardDisposable =
+                virgilRx.searchCards(identity)
+                        .subscribe((cards, throwable) -> {
+                            if (throwable == null)
+                                logInVirgilInteractor.onSearchCardSuccess(cards);
+                            else
+                                logInVirgilInteractor.onSearchCardError(throwable);
+                        });
+
+        compositeDisposable.add(searchCardDisposable);
+    }
+
+    public void requestPublishCard(String identity) {
+        Disposable publishCardDisposable =
+                virgilRx.publishCard(identity)
+                        .subscribe((card, throwable) -> {
+                            if (throwable == null)
+                                logInVirgilInteractor.onPublishCardSuccess(card);
+                            else
+                                logInVirgilInteractor.onPublishCardError(throwable);
+                        });
+
+        compositeDisposable.add(publishCardDisposable);
+    }
+
+    public void requestIfKeyExists(String keyName) {
+        if (privateKeyStorage.exists(keyName))
+            logInKeyStorageInteractor.onKeyExists();
+        else
+            logInKeyStorageInteractor.onKeyNotExists();
     }
 
     @Override public void disposeAll() {

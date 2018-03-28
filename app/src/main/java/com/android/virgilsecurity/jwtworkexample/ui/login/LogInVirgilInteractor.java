@@ -31,57 +31,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.data.local;
-
-import android.content.Context;
-
-import com.android.virgilsecurity.jwtworkexample.data.model.User;
-import com.google.gson.Gson;
-import com.virgilsecurity.sdk.cards.Card;
-
+package com.android.virgilsecurity.jwtworkexample.ui.login;
 /**
- * Created by Danylo Oliinyk on 3/23/18 at Virgil Security.
+ * Created by Danylo Oliinyk on 3/28/18 at Virgil Security.
  * -__o
  */
 
-public class UserManager extends PropertyManager {
+import com.virgilsecurity.sdk.cards.Card;
 
-    private static final String CURRENT_USER = "CURRENT_USER";
-    private static final String USER_CARD = "USER_CARD";
+import java.util.List;
 
-    public UserManager(Context context) {
-        super(context);
-    }
+/**
+ *   _  _
+ *  | || | _
+ * -| || || |   Created by:
+ *  | || || |-  Danylo Oliinyk
+ *   \_  || |   on
+ *     |  _/    3/28/18
+ *    -| | \    at Virgil Security
+ *     |_|-
+ */
 
-    public void setCurrentUser(User user) {
-        setValue(CURRENT_USER, new Gson().toJson(user));
-    }
+public interface LogInVirgilInteractor {
 
-    public User getCurrentUser() {
-        return new Gson().fromJson(
-                (String) getValue(CURRENT_USER,
-                                  PropertyManager.SupportedTypes.STRING,
-                                  null),
-                User.class);
-    }
+    void onSearchCardSuccess(List<Card> cards);
+    void onSearchCardError(Throwable t);
 
-    public void clearCurrentUser() {
-        clearValue(CURRENT_USER);
-    }
-
-    public void setUserCard(Card card) {
-        setValue(USER_CARD, new Gson().toJson(card));
-    }
-
-    public Card getUserCard() {
-        return new Gson().fromJson(
-                (String) getValue(USER_CARD,
-                                  SupportedTypes.STRING,
-                                  null),
-                Card.class);
-    }
-
-    public void clearUserCard() {
-        clearValue(USER_CARD);
-    }
+    void onPublishCardSuccess(Card card);
+    void onPublishCardError(Throwable t);
 }
