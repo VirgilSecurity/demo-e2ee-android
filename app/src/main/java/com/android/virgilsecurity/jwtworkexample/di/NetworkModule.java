@@ -33,6 +33,7 @@
 
 package com.android.virgilsecurity.jwtworkexample.di;
 
+import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.ui.login.LogInActivityComponent;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
 
@@ -74,5 +75,9 @@ public class NetworkModule {
                 .client(httpClient)
                 .baseUrl("http://google.com") // FIXME: 3/22/18 add BaseUrl
                 .build();
+    }
+
+    @Provides @Singleton static ServiceHelper provideServiceHelper(Retrofit retrofit) {
+        return new ServiceHelper(retrofit);
     }
 }

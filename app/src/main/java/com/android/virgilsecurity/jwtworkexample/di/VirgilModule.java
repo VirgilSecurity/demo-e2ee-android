@@ -38,7 +38,11 @@ import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
 import com.android.virgilsecurity.jwtworkexample.data.remote.RxServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.data.virgil.GetTokenCallbackImpl;
+import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilHelper;
+import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilRx;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivityComponent;
+import com.virgilsecurity.sdk.cards.validation.CardVerifier;
+import com.virgilsecurity.sdk.cards.validation.VirgilCardVerifier;
 import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.PrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
@@ -75,7 +79,7 @@ public class VirgilModule {
             ServiceHelper serviceHelper,
             UserManager userManager) {
 
-        return new GetTokenCallbackImpl(serviceHelper, userManager.getCurrentUser());
+        return new GetTokenCallbackImpl(serviceHelper, userManager);
     }
 
     @Provides @Singleton static AccessTokenProvider provideAccessTokenProvider(
@@ -97,5 +101,19 @@ public class VirgilModule {
             KeyStorage keyStorage) {
 
         return new PrivateKeyStorage(privateKeyExporter, keyStorage);
+    }
+
+    @Provides CardVerifier provideCardVerifier(CardCrypto cardCrypto) {
+        return new VirgilCardVerifier(cardCrypto);
+    }
+
+    @Provides VirgilHelper provideVirgilHelper(CardCrypto cardCrypto,
+                                               AccessTokenProvider tokenProvider,
+                                               CardVerifier cardVerifier) {
+        return new VirgilHelper(() -> cardCrypto, () -> tokenProvider, () -> cardVerifier);
+    }
+
+    @Provides @Singleton static VirgilRx provideVirgilRx(VirgilHelper virgilHelper) {
+        return new VirgilRx(virgilHelper);
     }
 }

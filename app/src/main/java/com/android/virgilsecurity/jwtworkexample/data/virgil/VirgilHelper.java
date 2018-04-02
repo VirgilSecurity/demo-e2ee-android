@@ -109,15 +109,15 @@ public class VirgilHelper {
         return cardManager;
     }
 
-    private interface InitCardCrypto {
+    public interface InitCardCrypto {
         CardCrypto initialize();
     }
 
-    private interface InitAccessTokenProvider {
+    public interface InitAccessTokenProvider {
         AccessTokenProvider initialize();
     }
 
-    private interface InitCardVerifier {
+    public interface InitCardVerifier {
         CardVerifier initialize();
     }
 }

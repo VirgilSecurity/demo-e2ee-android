@@ -39,6 +39,8 @@ import android.content.Context;
 import com.android.virgilsecurity.jwtworkexample.data.local.PropertyManager;
 import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivityComponent;
+import com.android.virgilsecurity.jwtworkexample.util.DefaultErrorResolver;
+import com.android.virgilsecurity.jwtworkexample.util.ErrorResolver;
 
 import javax.inject.Singleton;
 
@@ -63,5 +65,9 @@ public class UtilModule {
 
     @Provides @Singleton static UserManager provideUserManager(Context context) {
         return new UserManager(context);
+    }
+
+    @Provides @Singleton ErrorResolver provideErrorResolver() {
+        return new DefaultErrorResolver();
     }
 }

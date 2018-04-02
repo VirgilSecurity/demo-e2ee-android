@@ -35,6 +35,7 @@ package com.android.virgilsecurity.jwtworkexample.data.local;
 
 import android.content.Context;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.Token;
 import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.google.gson.Gson;
 import com.virgilsecurity.sdk.cards.Card;
@@ -48,10 +49,12 @@ public class UserManager extends PropertyManager {
 
     private static final String CURRENT_USER = "CURRENT_USER";
     private static final String USER_CARD = "USER_CARD";
+    private static final String GOOGLE_TOKEN = "GOOGLE_TOKEN";
 
     public UserManager(Context context) {
         super(context);
     }
+
 
     public void setCurrentUser(User user) {
         setValue(CURRENT_USER, new Gson().toJson(user));
@@ -69,6 +72,7 @@ public class UserManager extends PropertyManager {
         clearValue(CURRENT_USER);
     }
 
+
     public void setUserCard(Card card) {
         setValue(USER_CARD, new Gson().toJson(card));
     }
@@ -83,5 +87,23 @@ public class UserManager extends PropertyManager {
 
     public void clearUserCard() {
         clearValue(USER_CARD);
+    }
+
+
+    public void setGoogleToken(Token token) {
+        setValue(GOOGLE_TOKEN, new Gson().toJson(token));
+    }
+
+    public Token getGoogleToken() {
+        return new Gson().fromJson(
+                (String) getValue(GOOGLE_TOKEN,
+                                  SupportedTypes.STRING,
+                                  null),
+                Token.class
+        );
+    }
+
+    public void clearGoogleToken() {
+        clearValue(GOOGLE_TOKEN);
     }
 }

@@ -55,10 +55,10 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasFragmentInjector;
 import retrofit2.Retrofit;
 
-public class LogInActivity extends BaseActivityDi implements HasFragmentInjector {
+public final class LogInActivity extends BaseActivityDi implements HasFragmentInjector {
 
-    @Inject DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
-    @Inject UserManager userManager;
+    @Inject protected DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
+    @Inject protected UserManager userManager;
 
     public static void start(Activity from) {
         from.startActivity(new Intent(from, LogInActivity.class));

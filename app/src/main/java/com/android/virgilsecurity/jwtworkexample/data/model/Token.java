@@ -31,11 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.util;
-
-import android.support.annotation.Nullable;
-
-import retrofit2.HttpException;
+package com.android.virgilsecurity.jwtworkexample.data.model;
 
 /**
  * . _  _
@@ -43,34 +39,11 @@ import retrofit2.HttpException;
  * -| || || |   Created by:
  * .| || || |-  Danylo Oliinyk
  * ..\_  || |   on
- * ....|  _/    3/28/18
+ * ....|  _/    4/2/18
  * ...-| | \    at Virgil Security
  * ....|_|-
  */
-public final class DefaultErrorHandler extends ErrorResolver {
+public interface Token {
 
-    @Override @Nullable protected String baseResolve(Throwable t) {
-        if (t instanceof HttpException) {
-            HttpException exception = (HttpException) t;
-
-            switch (exception.code()) {
-                case Const.Http.BAD_REQUEST:
-                    return "Bad Request";
-                case Const.Http.UNAUTHORIZED:
-                    return "Unauthorized";
-                case Const.Http.FORBIDDEN:
-                    return "Forbidden";
-                case Const.Http.NOT_ACCEPTABLE:
-                    return "Not acceptable";
-                case Const.Http.UNPROCESSABLE_ENTITY:
-                    return "Unprocessable entity";
-                case Const.Http.SERVER_ERROR:
-                    return "Server error";
-                default:
-                    return null;
-            }
-        } else {
-            return null;
-        }
-    }
+    String getToken();
 }

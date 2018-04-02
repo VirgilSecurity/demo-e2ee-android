@@ -31,16 +31,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.ui.login;
+package com.android.virgilsecurity.jwtworkexample.data.model;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by Danylo Oliinyk on 3/22/18 at Virgil Security.
- * -__o
+ * . _  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/2/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
+public class GoogleToken implements Token {
 
-public interface LogInInteractor {
+    @SerializedName("token")
+    private final String token;
 
-    void onSuccess();
+    public GoogleToken(String token) {
+        this.token = token;
+    }
 
-    void onError();
+    @Override public String getToken() {
+        return token;
+    }
 }

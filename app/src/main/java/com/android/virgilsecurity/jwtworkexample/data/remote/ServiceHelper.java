@@ -33,6 +33,7 @@
 
 package com.android.virgilsecurity.jwtworkexample.data.remote;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.Token;
 import com.android.virgilsecurity.jwtworkexample.data.model.TokenResponse;
 import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.android.virgilsecurity.jwtworkexample.data.model.UsersRepsonse;
@@ -56,7 +57,7 @@ public class ServiceHelper {
         this.service = retrofit.create(JwtExampleService.class);
     }
 
-    public Call<TokenResponse> getToken(String googleToken) {
+    public Call<TokenResponse> getToken(Token googleToken) {
         return service.getToken(googleToken);
     }
 }

@@ -33,14 +33,14 @@
 
 package com.android.virgilsecurity.jwtworkexample.ui.login;
 
-import com.virgilsecurity.sdk.jwt.accessProviders.CallbackJwtProvider;
-import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
-
-import javax.inject.Singleton;
+import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilRx;
+import com.android.virgilsecurity.jwtworkexample.ui.base.BasePresenter;
+import com.android.virgilsecurity.jwtworkexample.util.DefaultErrorResolver;
+import com.android.virgilsecurity.jwtworkexample.util.ErrorResolver;
+import com.virgilsecurity.sdk.storage.PrivateKeyStorage;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.Retrofit;
 
 /**
  * Created by Danylo Oliinyk on 3/22/18 at Virgil Security.
@@ -50,4 +50,19 @@ import retrofit2.Retrofit;
 @Module
 public class LogInFragmentModule {
 
+    @Provides LogInVirgilInteractor provideLogInVirgilInteractor(LogInFragment logInFragment) {
+        return logInFragment;
+    }
+
+    @Provides LogInKeyStorageInteractor provideLogInKeyStorageInteractor(LogInFragment logInFragment) {
+        return logInFragment;
+    }
+
+    @Provides BasePresenter providePresenter(VirgilRx virgilRx,
+                                             PrivateKeyStorage privateKeyStorage,
+                                             LogInVirgilInteractor logInVirgilInteractor,
+                                             LogInKeyStorageInteractor logInKeyStorageInteractor) {
+
+        return new LogInPresenter(virgilRx, privateKeyStorage, logInVirgilInteractor, logInKeyStorageInteractor);
+    }
 }

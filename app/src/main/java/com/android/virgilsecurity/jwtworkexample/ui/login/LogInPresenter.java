@@ -33,6 +33,7 @@
 
 package com.android.virgilsecurity.jwtworkexample.ui.login;
 
+import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilRx;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BasePresenter;
 import com.virgilsecurity.sdk.cards.Card;
@@ -60,6 +61,7 @@ public class LogInPresenter implements BasePresenter {
     private LogInKeyStorageInteractor logInKeyStorageInteractor;
     private VirgilRx virgilRx;
     private PrivateKeyStorage privateKeyStorage;
+    private ServiceHelper serviceHelper;
 
     @Inject
     public LogInPresenter(VirgilRx virgilRx,

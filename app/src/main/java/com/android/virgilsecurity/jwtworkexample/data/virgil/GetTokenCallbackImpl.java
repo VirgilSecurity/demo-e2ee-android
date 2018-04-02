@@ -35,6 +35,7 @@ package com.android.virgilsecurity.jwtworkexample.data.virgil;
 
 import android.accounts.NetworkErrorException;
 
+import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
 import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.android.virgilsecurity.jwtworkexample.data.model.exception.ServiceException;
 import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
@@ -51,17 +52,17 @@ import retrofit2.Retrofit;
 
 public class GetTokenCallbackImpl implements CallbackJwtProvider.GetTokenCallback {
 
-    private ServiceHelper helper;
-    private User currentUser;
+    private final ServiceHelper helper;
+    private final UserManager userManager;
 
-    public GetTokenCallbackImpl(ServiceHelper helper, User currentUser) {
+    public GetTokenCallbackImpl(ServiceHelper helper, UserManager userManager) {
         this.helper = helper;
-        this.currentUser = currentUser;
+        this.userManager = userManager;
     }
 
     @Override public String onGetToken() {
         try {
-            return helper.getToken(currentUser.getEmailPrefix()).execute().body().getToken();
+            return helper.getToken(userManager.getGoogleToken()).execute().body().getToken();
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
             throw new ServiceException("Failed on get token");

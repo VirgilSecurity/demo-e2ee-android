@@ -39,6 +39,8 @@ import android.os.Bundle;
 
 import com.android.virgilsecurity.jwtworkexample.R;
 import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
+import com.android.virgilsecurity.jwtworkexample.data.model.GoogleToken;
+import com.android.virgilsecurity.jwtworkexample.data.model.Token;
 import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
 import com.android.virgilsecurity.jwtworkexample.util.ErrorResolver;
@@ -66,6 +68,9 @@ import butterknife.BindView;
 public final class LogInFragment
         extends BaseFragmentDi<LogInActivity>
         implements LogInVirgilInteractor, LogInKeyStorageInteractor {
+
+    private static final String REQUEST_ID_TOKEN = "681673183198-m9sm47puqhdirvms732m8fa4k996n1ev.apps.googleusercontent.com";
+    private static final String REQUEST_SERVER_AUTH_CODE = "snubKcPLscvA9owuCtlAZAOv";
 
     private static final int RC_SIGN_IN = 42;
 
@@ -96,6 +101,7 @@ public final class LogInFragment
 
     @SuppressLint("RestrictedApi") private void initGoogleAuth() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(REQUEST_ID_TOKEN)
                 .requestEmail()
                 .build();
 
@@ -123,8 +129,11 @@ public final class LogInFragment
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
             UiUtils.toast(this, "Signed In as " + account.getDisplayName());
+
             User user = new User(account.getEmail());
             userManager.setCurrentUser(user);
+            userManager.setGoogleToken(new GoogleToken(account.getIdToken()));
+
             presenter.requestSearchCards(user.getEmailPrefix());
         } catch (ApiException ignored) {
             UiUtils.toast(this, "Error\nCode: " + ignored.getStatusCode()

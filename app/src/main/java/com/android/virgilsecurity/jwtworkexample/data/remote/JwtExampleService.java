@@ -33,13 +33,17 @@
 
 package com.android.virgilsecurity.jwtworkexample.data.remote;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.GoogleToken;
+import com.android.virgilsecurity.jwtworkexample.data.model.Token;
 import com.android.virgilsecurity.jwtworkexample.data.model.TokenResponse;
 import com.android.virgilsecurity.jwtworkexample.data.model.UsersRepsonse;
 
 import io.reactivex.Single;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
+import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 
@@ -56,7 +60,7 @@ public interface JwtExampleService {
             @Path("google_token") String googleToken
     );
 
-    @GET("auth/login/{google_token}") Call<TokenResponse> getToken(
-            @Path("google_token") String googleToken
+    @POST("tokensignin") Call<TokenResponse> getToken(
+            @Body Token token
     );
 }
