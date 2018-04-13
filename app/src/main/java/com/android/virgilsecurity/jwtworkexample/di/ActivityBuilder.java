@@ -33,6 +33,10 @@
 
 package com.android.virgilsecurity.jwtworkexample.di;
 
+import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
+import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivityModule;
+import com.android.virgilsecurity.jwtworkexample.ui.chat.thread.ThreadFragmentProvider;
+import com.android.virgilsecurity.jwtworkexample.ui.chat.threadList.ThreadsListFragmentProvider;
 import com.android.virgilsecurity.jwtworkexample.ui.login.LogInFragmentProvider;
 import com.android.virgilsecurity.jwtworkexample.ui.login.LogInActivity;
 import com.android.virgilsecurity.jwtworkexample.ui.login.LogInActivityModule;
@@ -53,4 +57,11 @@ public abstract class ActivityBuilder {
             LogInFragmentProvider.class
     })
     abstract LogInActivity bindLogInActivity();
+
+    @ContributesAndroidInjector(modules = {
+            ChatControlActivityModule.class,
+            ThreadFragmentProvider.class,
+            ThreadsListFragmentProvider.class
+    })
+    abstract ChatControlActivity bindChatControlActivity();
 }

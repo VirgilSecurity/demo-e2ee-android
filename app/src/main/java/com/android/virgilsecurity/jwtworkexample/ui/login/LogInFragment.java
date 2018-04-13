@@ -56,9 +56,13 @@ import com.virgilsecurity.sdk.cards.Card;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
+
+import static com.android.virgilsecurity.jwtworkexample.di.InjectionConstants.REQUEST_ID_TOKEN;
 
 /**
  * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
@@ -69,7 +73,6 @@ public final class LogInFragment
         extends BaseFragmentDi<LogInActivity>
         implements LogInVirgilInteractor, LogInKeyStorageInteractor {
 
-    private static final String REQUEST_ID_TOKEN = "681673183198-m9sm47puqhdirvms732m8fa4k996n1ev.apps.googleusercontent.com";
     private static final String REQUEST_SERVER_AUTH_CODE = "snubKcPLscvA9owuCtlAZAOv";
 
     private static final int RC_SIGN_IN = 42;
@@ -78,6 +81,7 @@ public final class LogInFragment
     @Inject protected LogInPresenter presenter;
     @Inject protected UserManager userManager;
     @Inject protected ErrorResolver errorResolver;
+    @Inject @Named(REQUEST_ID_TOKEN) @Nullable protected String requestIdToken;
 
     @BindView(R.id.signInButton)
     protected SignInButton signInButton;
@@ -101,7 +105,7 @@ public final class LogInFragment
 
     @SuppressLint("RestrictedApi") private void initGoogleAuth() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(REQUEST_ID_TOKEN)
+                .requestIdToken(requestIdToken)
                 .requestEmail()
                 .build();
 
@@ -179,5 +183,11 @@ public final class LogInFragment
         UiUtils.toast(this, R.string.no_private_key); // TODO: 3/28/18 add dialog with explanation that
                                                                //               user can sign in again but won't
                                                                //               be able to decrypt old messages
+    }
+
+    @Override public void onStop() {
+        super.onStop();
+
+        presenter.disposeAll();
     }
 }

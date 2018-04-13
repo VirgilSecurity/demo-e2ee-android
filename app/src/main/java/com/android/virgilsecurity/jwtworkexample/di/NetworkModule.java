@@ -73,7 +73,7 @@ public class NetworkModule {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient)
-                .baseUrl("http://google.com") // FIXME: 3/22/18 add BaseUrl
+                .baseUrl("http://10.0.2.2") // FIXME: 3/22/18 change to remote url
                 .build();
     }
 

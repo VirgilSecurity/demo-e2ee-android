@@ -33,9 +33,6 @@
 
 package com.android.virgilsecurity.jwtworkexample.ui.login;
 
-import com.android.virgilsecurity.jwtworkexample.ui.login.LogInFragment;
-import com.android.virgilsecurity.jwtworkexample.ui.login.LogInFragmentModule;
-
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 

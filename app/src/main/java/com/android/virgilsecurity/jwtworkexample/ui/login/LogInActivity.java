@@ -45,6 +45,8 @@ import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 import java.util.List;
 
@@ -80,6 +82,15 @@ public final class LogInActivity extends BaseActivityDi implements HasFragmentIn
     }
 
     @Override protected void postButterInit() {
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken("")
+//                .requestEmail()
+//                .build();
+//
+//        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
+//        googleSignInClient.signOut();
+
+
         @SuppressLint("RestrictedApi")
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 

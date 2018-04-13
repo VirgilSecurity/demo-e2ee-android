@@ -34,6 +34,7 @@
 package com.android.virgilsecurity.jwtworkexample.ui.chat;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.support.annotation.StringDef;
 import android.support.design.widget.NavigationView;
@@ -45,28 +46,40 @@ import android.widget.TextView;
 import com.android.virgilsecurity.jwtworkexample.R;
 import com.android.virgilsecurity.jwtworkexample.data.local.PropertyManager;
 import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
+import com.android.virgilsecurity.jwtworkexample.di.InjectionConstants;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseActivity;
+import com.android.virgilsecurity.jwtworkexample.ui.base.BaseActivityDi;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.thread.ThreadFragment;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.threadList.ThreadsListFragment;
 import com.android.virgilsecurity.jwtworkexample.ui.login.LogInActivity;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
 import com.android.virgilsecurity.jwtworkexample.util.common.OnFinishTimer;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasFragmentInjector;
+
+import static com.android.virgilsecurity.jwtworkexample.di.InjectionConstants.REQUEST_ID_TOKEN;
 
 /**
  * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
  * -__o
  */
 
-public class ChatControlActivity extends BaseActivity {
+public class ChatControlActivity extends BaseActivityDi implements HasFragmentInjector {
 
     public static final String USERNAME = "USERNAME";
 
@@ -74,7 +87,9 @@ public class ChatControlActivity extends BaseActivity {
     private ThreadFragment threadFragment;
     private boolean secondPress;
 
+    @Inject protected DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
     @Inject UserManager userManager;
+    @Inject @Named(REQUEST_ID_TOKEN) @Nullable String requestIdToken;
 
     @BindView(R.id.toolbar)
     protected Toolbar toolbar;
@@ -100,12 +115,13 @@ public class ChatControlActivity extends BaseActivity {
     }
 
     public static void startWithFinish(Activity from, String username) {
-        from.startActivity(new Intent(from, ChatControlActivity.class).putExtra(USERNAME, username));
+        from.startActivity(new Intent(from, ChatControlActivity.class).putExtra(USERNAME,
+                                                                                username));
         from.finish();
     }
 
     @Override protected int getLayout() {
-        return 0;
+        return R.layout.activity_chat_control;
     }
 
     @Override protected void postButterInit() {
@@ -158,6 +174,14 @@ public class ChatControlActivity extends BaseActivity {
                     userManager.clearCurrentUser();
                     userManager.clearUserCard();
 
+                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(requestIdToken)
+                            .requestEmail()
+                            .build();
+
+                    GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
+                    googleSignInClient.signOut();
+
                     threadFragment.disposeAll();
                     threadsListFragment.disposeAll();
                     LogInActivity.startClearTop(this);
@@ -183,5 +207,9 @@ public class ChatControlActivity extends BaseActivity {
                 secondPress = false;
             }
         }.start();
+    }
+
+    @Override public AndroidInjector<Fragment> fragmentInjector() {
+        return fragmentDispatchingAndroidInjector;
     }
 }

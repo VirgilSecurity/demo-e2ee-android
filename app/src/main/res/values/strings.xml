@@ -35,6 +35,9 @@
 
     <string name="app_name">JwtWorkExample</string>
 
+    <!-- Credentials -->
+    <string name="requestIdToken">681673183198-m9sm47puqhdirvms732m8fa4k996n1ev.apps.googleusercontent.com</string>
+
     <!-- General -->
     <string name="no_internet">Please, check your internet state</string>
     <string name="error_loading">Please, swipe from top to retry</string>

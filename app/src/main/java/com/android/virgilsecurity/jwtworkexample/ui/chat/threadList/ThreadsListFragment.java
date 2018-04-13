@@ -35,6 +35,7 @@ package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
 
 import android.app.Fragment;
 
+import com.android.virgilsecurity.jwtworkexample.R;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
 
@@ -45,9 +46,8 @@ import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
 
 public class ThreadsListFragment extends BaseFragmentDi<ChatControlActivity> {
 
-
     @Override protected int getLayout() {
-        return 0;
+        return R.layout.fragment_threads_list;
     }
 
     @Override protected void postButterInit() {

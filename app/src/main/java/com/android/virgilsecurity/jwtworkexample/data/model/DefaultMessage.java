@@ -41,15 +41,21 @@ package com.android.virgilsecurity.jwtworkexample.data.model;
 public class DefaultMessage implements Message {
 
     private final String sender;
+    private final String receiver;
     private final String text;
 
-    public DefaultMessage(String sender, String text) {
+    public DefaultMessage(String sender, String receiver, String text) {
         this.sender = sender;
+        this.receiver = receiver;
         this.text = text;
     }
 
     @Override public String getSender() {
         return sender;
+    }
+
+    @Override public String getReceiver() {
+        return receiver;
     }
 
     @Override public String getText() {

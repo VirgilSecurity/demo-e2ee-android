@@ -44,9 +44,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiConsumer;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 
 /**
@@ -72,11 +75,15 @@ public class LogInPresenter implements BasePresenter {
         this.privateKeyStorage = privateKeyStorage;
         this.logInVirgilInteractor = logInVirgilInteractor;
         this.logInKeyStorageInteractor = logInKeyStorageInteractor;
+
+        compositeDisposable = new CompositeDisposable();
     }
 
     public void requestSearchCards(String identity) {
         Disposable searchCardDisposable =
                 virgilRx.searchCards(identity)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
                         .subscribe((cards, throwable) -> {
                             if (throwable == null)
                                 logInVirgilInteractor.onSearchCardSuccess(cards);
@@ -90,6 +97,8 @@ public class LogInPresenter implements BasePresenter {
     public void requestPublishCard(String identity) {
         Disposable publishCardDisposable =
                 virgilRx.publishCard(identity)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
                         .subscribe((card, throwable) -> {
                             if (throwable == null)
                                 logInVirgilInteractor.onPublishCardSuccess(card);

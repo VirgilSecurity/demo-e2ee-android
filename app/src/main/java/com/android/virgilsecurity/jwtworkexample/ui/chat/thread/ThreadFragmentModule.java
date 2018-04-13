@@ -31,36 +31,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.data.remote;
+package com.android.virgilsecurity.jwtworkexample.ui.chat.thread;
 
-import com.android.virgilsecurity.jwtworkexample.data.model.GoogleToken;
-import com.android.virgilsecurity.jwtworkexample.data.model.Token;
-import com.android.virgilsecurity.jwtworkexample.data.model.TokenResponse;
-import com.android.virgilsecurity.jwtworkexample.data.model.UsersRepsonse;
-
-import io.reactivex.Single;
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.PATCH;
-import retrofit2.http.POST;
-import retrofit2.http.Part;
-import retrofit2.http.Path;
+import dagger.Module;
 
 /**
- * Created by Danylo Oliinyk on 3/22/18 at Virgil Security.
- * -__o
+ * . _  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/13/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
 
-public interface JwtExampleService {
-
-    @GET("users") Single<UsersRepsonse> getUsersRx();
-
-    @GET("auth/login/{google_token}") Single<TokenResponse> getTokenRx(
-            @Path("google_token") String googleToken
-    );
-
-    @POST("token") Call<TokenResponse> getToken(
-            @Body Token token
-    );
+@Module
+public class ThreadFragmentModule {
 }

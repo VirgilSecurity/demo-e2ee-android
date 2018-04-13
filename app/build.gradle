@@ -101,4 +101,7 @@ dependencies {
 
     // RxWebSockets
     implementation "com.github.jacek-marchwicki:JavaWebsocketClient:$rxWebSockets"
+
+    // Apache commons
+    implementation "org.apache.commons:commons-lang3:$apacheCommons"
 }

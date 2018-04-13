@@ -41,8 +41,10 @@ import com.android.virgilsecurity.jwtworkexample.data.virgil.GetTokenCallbackImp
 import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilHelper;
 import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilRx;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivityComponent;
+import com.virgilsecurity.sdk.cards.ModelSigner;
 import com.virgilsecurity.sdk.cards.validation.CardVerifier;
 import com.virgilsecurity.sdk.cards.validation.VirgilCardVerifier;
+import com.virgilsecurity.sdk.client.CardClient;
 import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.PrivateKeyExporter;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
@@ -69,6 +71,14 @@ public class VirgilModule {
 
     @Provides @Singleton static VirgilCrypto provideVirgilCrypto() {
         return new VirgilCrypto();
+    }
+
+    @Provides @Singleton static CardClient provideCardClient() {
+        return new CardClient();
+    }
+
+    @Provides @Singleton static ModelSigner provideModelSigner(CardCrypto cardCrypto) {
+        return new ModelSigner(cardCrypto);
     }
 
     @Provides @Singleton static CardCrypto provideCardCrypto() {
@@ -107,10 +117,16 @@ public class VirgilModule {
         return new VirgilCardVerifier(cardCrypto);
     }
 
-    @Provides VirgilHelper provideVirgilHelper(CardCrypto cardCrypto,
+    @Provides VirgilHelper provideVirgilHelper(CardClient cardClient,
+                                               ModelSigner modelSigner,
+                                               CardCrypto cardCrypto,
                                                AccessTokenProvider tokenProvider,
                                                CardVerifier cardVerifier) {
-        return new VirgilHelper(() -> cardCrypto, () -> tokenProvider, () -> cardVerifier);
+        return new VirgilHelper(() -> cardClient,
+                                () -> modelSigner,
+                                () -> cardCrypto,
+                                () -> tokenProvider,
+                                () -> cardVerifier);
     }
 
     @Provides @Singleton static VirgilRx provideVirgilRx(VirgilHelper virgilHelper) {

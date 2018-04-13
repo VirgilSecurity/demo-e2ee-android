@@ -35,6 +35,7 @@ package com.android.virgilsecurity.jwtworkexample.data.local;
 
 import android.content.Context;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.GoogleToken;
 import com.android.virgilsecurity.jwtworkexample.data.model.Token;
 import com.android.virgilsecurity.jwtworkexample.data.model.User;
 import com.google.gson.Gson;
@@ -99,7 +100,7 @@ public class UserManager extends PropertyManager {
                 (String) getValue(GOOGLE_TOKEN,
                                   SupportedTypes.STRING,
                                   null),
-                Token.class
+                GoogleToken.class
         );
     }
 

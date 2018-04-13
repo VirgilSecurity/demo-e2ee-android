@@ -54,6 +54,7 @@
 
         <fragment
             android:id="@+id/threadFragment"
+            android:name="com.android.virgilsecurity.jwtworkexample.ui.chat.thread.ThreadFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

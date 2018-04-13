@@ -36,9 +36,11 @@ package com.android.virgilsecurity.jwtworkexample.data.virgil;
 import com.android.virgilsecurity.jwtworkexample.data.model.exception.KeyGenerationException;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardManager;
+import com.virgilsecurity.sdk.cards.ModelSigner;
 import com.virgilsecurity.sdk.cards.model.RawCardContent;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.cards.validation.CardVerifier;
+import com.virgilsecurity.sdk.client.CardClient;
 import com.virgilsecurity.sdk.client.exceptions.VirgilServiceException;
 import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
@@ -59,17 +61,15 @@ public class VirgilHelper {
 
     private final CardManager cardManager;
 
-    public VirgilHelper(InitCardCrypto initCardCrypto,
+    public VirgilHelper(InitCardClient initCardClient,
+                        InitModelSigner initModelSigner,
+                        InitCardCrypto initCardCrypto,
                         InitAccessTokenProvider initAccessTokenProvider,
                         InitCardVerifier initCardVerifier) {
 
-        cardManager = initCardManager(initCardCrypto, initAccessTokenProvider, initCardVerifier);
-    }
-
-    private CardManager initCardManager(InitCardCrypto initCardCrypto,
-                                        InitAccessTokenProvider initAccessTokenProvider,
-                                        InitCardVerifier initCardVerifier) {
-        return new CardManager.Builder()
+        cardManager = new CardManager.Builder()
+                .setCardClient(initCardClient.initialize())
+                .setModelSigner(initModelSigner.initialize())
                 .setCrypto(initCardCrypto.initialize())
                 .setAccessTokenProvider(initAccessTokenProvider.initialize())
                 .setCardVerifier(initCardVerifier.initialize())
@@ -107,6 +107,14 @@ public class VirgilHelper {
 
     public CardManager getCardManager() {
         return cardManager;
+    }
+
+    public interface InitCardClient {
+        CardClient initialize();
+    }
+
+    public interface InitModelSigner {
+        ModelSigner initialize();
     }
 
     public interface InitCardCrypto {
