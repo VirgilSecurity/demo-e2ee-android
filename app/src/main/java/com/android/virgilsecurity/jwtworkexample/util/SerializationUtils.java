@@ -31,66 +31,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
+package com.android.virgilsecurity.jwtworkexample.util;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import com.android.virgilsecurity.jwtworkexample.R;
-import com.android.virgilsecurity.jwtworkexample.data.model.ChatThread;
-import com.android.virgilsecurity.jwtworkexample.data.model.Message;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.Type;
 
 /**
- * Created by Danylo Oliinyk on 3/27/18 at Virgil Security.
- * -__o
+ * .._  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/16/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
+public final class SerializationUtils {
 
-public class ChatThreadsAdapter extends RecyclerView.Adapter<ChatThreadsAdapter.ChatThreadViewHolder> {
+    private static Gson gson;
 
-    private List<ChatThread> items;
-
-    public ChatThreadsAdapter() {
-        items = Collections.emptyList();
+    private static Gson getMapper() {
+        return gson == null ? new Gson() : gson;
     }
 
-    @Override public ChatThreadViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                                  .inflate(R.layout.item_list_threads, parent, false);
-
-        return new ChatThreadViewHolder(view);
+    public static String toJson(Object toSerialize) {
+        return getMapper().toJson(toSerialize);
     }
 
-    @Override public void onBindViewHolder(ChatThreadViewHolder holder, int position) {
-
-    }
-
-    @Override public int getItemCount() {
-        return items != null ? items.size() : -1;
-    }
-
-    public void addItems(List<ChatThread> items) {
-        if (items == null)
-            items = new ArrayList<>();
-
-        this.items.addAll(items);
-        notifyDataSetChanged();
-    }
-
-    public class ChatThreadViewHolder extends RecyclerView.ViewHolder {
-
-
-        public ChatThreadViewHolder(View itemView) {
-            super(itemView);
-        }
-
-        public void onBind(Message message) {
-
-        }
+    public static <T> T fromJson(String toDeserialize, Type classType) {
+        return getMapper().fromJson(toDeserialize, classType);
     }
 }

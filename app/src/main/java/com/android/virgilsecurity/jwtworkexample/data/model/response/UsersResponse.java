@@ -31,44 +31,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.data.model;
+package com.android.virgilsecurity.jwtworkexample.data.model.response;
 
-import com.google.gson.annotations.Expose;
+import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
 /**
- * Created by Danylo Oliinyk on 3/22/18 at Virgil Security.
- * -__o
+ * .._  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/16/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
-
-public class UsersRepsonse {
+public final class UsersResponse {
 
     @SerializedName("users")
-    final private List<User> users;
+    private final List<DefaultUser> users;
 
-    @SerializedName("message")
-    final private String message;
-
-    @SerializedName("status_code")
-    final private String statusCode;
-
-    public UsersRepsonse(List<User> users, String message, String statusCode) {
+    public UsersResponse(List<DefaultUser> users) {
         this.users = users;
-        this.message = message;
-        this.statusCode = statusCode;
     }
 
-    public List<User> getUsers() {
+    public List<DefaultUser> getUsers() {
         return users;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getStatusCode() {
-        return statusCode;
     }
 }

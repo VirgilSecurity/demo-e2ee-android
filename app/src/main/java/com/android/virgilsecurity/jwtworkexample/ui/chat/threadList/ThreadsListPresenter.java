@@ -34,8 +34,14 @@
 package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
 
 /**
- * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
- * -__o
+ * . _  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    3/21/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
 
 public class ThreadsListPresenter {

@@ -36,12 +36,14 @@ package com.android.virgilsecurity.jwtworkexample.di;
 import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.ui.login.LogInActivityComponent;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
+import com.appunite.websocket.rx.RxWebSockets;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -73,11 +75,19 @@ public class NetworkModule {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient)
-                .baseUrl("http://10.0.2.2") // FIXME: 3/22/18 change to remote url
+                .baseUrl("http://10.0.2.2:7070") // FIXME: 3/22/18 change to remote url
                 .build();
     }
 
     @Provides @Singleton static ServiceHelper provideServiceHelper(Retrofit retrofit) {
         return new ServiceHelper(retrofit);
+    }
+
+    @Provides @Singleton static RxWebSockets provideRxWebSockets(OkHttpClient httpClient) {
+        return new RxWebSockets(httpClient,
+                                new Request.Builder()
+                                        .get()
+                                        .url("ws://10.0.2.2:7070/chat") // FIXME: 3/28/18 change URL to remote
+                                        .build());
     }
 }

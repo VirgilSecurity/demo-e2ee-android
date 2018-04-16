@@ -33,7 +33,9 @@
 
 package com.android.virgilsecurity.jwtworkexample.data.model;
 
-public interface User {
+public interface Response {
 
-    String getName();
+    String getType();
+
+    Object getResponseObject();
 }

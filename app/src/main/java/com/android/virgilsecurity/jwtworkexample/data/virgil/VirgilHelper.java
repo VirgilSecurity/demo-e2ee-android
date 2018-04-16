@@ -33,11 +33,12 @@
 
 package com.android.virgilsecurity.jwtworkexample.data.virgil;
 
+import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
+import com.android.virgilsecurity.jwtworkexample.data.model.exception.DecryptionException;
 import com.android.virgilsecurity.jwtworkexample.data.model.exception.KeyGenerationException;
 import com.virgilsecurity.sdk.cards.Card;
 import com.virgilsecurity.sdk.cards.CardManager;
 import com.virgilsecurity.sdk.cards.ModelSigner;
-import com.virgilsecurity.sdk.cards.model.RawCardContent;
 import com.virgilsecurity.sdk.cards.model.RawSignedModel;
 import com.virgilsecurity.sdk.cards.validation.CardVerifier;
 import com.virgilsecurity.sdk.client.CardClient;
@@ -46,9 +47,11 @@ import com.virgilsecurity.sdk.crypto.CardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
+import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
 import com.virgilsecurity.sdk.storage.PrivateKeyStorage;
+import com.virgilsecurity.sdk.utils.ConvertionUtils;
 
 import java.util.List;
 
@@ -60,12 +63,19 @@ import java.util.List;
 public class VirgilHelper {
 
     private final CardManager cardManager;
+    private final PrivateKeyStorage privateKeyStorage;
+    private final UserManager userManager;
 
     public VirgilHelper(InitCardClient initCardClient,
                         InitModelSigner initModelSigner,
                         InitCardCrypto initCardCrypto,
                         InitAccessTokenProvider initAccessTokenProvider,
-                        InitCardVerifier initCardVerifier) {
+                        InitCardVerifier initCardVerifier,
+                        InitPrivateKeyStorage initPrivateKeyStorage,
+                        InitUserManager initUserManager) {
+
+        this.privateKeyStorage = initPrivateKeyStorage.initialize();
+        this.userManager = initUserManager.initialize();
 
         cardManager = new CardManager.Builder()
                 .setCardClient(initCardClient.initialize())
@@ -78,6 +88,9 @@ public class VirgilHelper {
 
     public Card publishCard(String identity) throws CryptoException, VirgilServiceException {
         VirgilKeyPair keyPair = generateKeyPair();
+
+        privateKeyStorage.store(keyPair.getPrivateKey(), identity, null);
+
         RawSignedModel cardModel = cardManager.generateRawCard(keyPair.getPrivateKey(),
                                                                keyPair.getPublicKey(),
                                                                identity);
@@ -98,6 +111,20 @@ public class VirgilHelper {
         } catch (CryptoException e) {
             e.printStackTrace();
             throw new KeyGenerationException(e);
+        }
+    }
+
+    public String decrypt(byte[] cipherData) {
+        try {
+            byte[] decryptedData =
+                    getVirgilCrypto().decrypt(cipherData,
+                                              (VirgilPrivateKey) privateKeyStorage.load(
+                                                      userManager.getCurrentUser()
+                                                                 .getName()).getLeft());
+            return ConvertionUtils.toString(decryptedData);
+        } catch (CryptoException e) {
+            e.printStackTrace();
+            throw new DecryptionException("Failed to decrypt data ):");
         }
     }
 
@@ -127,5 +154,13 @@ public class VirgilHelper {
 
     public interface InitCardVerifier {
         CardVerifier initialize();
+    }
+
+    public interface InitPrivateKeyStorage {
+        PrivateKeyStorage initialize();
+    }
+
+    public interface InitUserManager {
+        UserManager initialize();
     }
 }

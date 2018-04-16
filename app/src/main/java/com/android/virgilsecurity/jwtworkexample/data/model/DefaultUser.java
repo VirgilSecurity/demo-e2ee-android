@@ -33,7 +33,20 @@
 
 package com.android.virgilsecurity.jwtworkexample.data.model;
 
-public interface User {
+/**
+ * Created by Danylo Oliinyk on 3/22/18 at Virgil Security.
+ * -__o
+ */
 
-    String getName();
+public class DefaultUser implements User {
+
+    final private String name;
+
+    public DefaultUser(String name) {
+        this.name = name;
+    }
+
+    @Override public String getName() {
+        return name;
+    }
 }

@@ -45,17 +45,12 @@ import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasFragmentInjector;
-import retrofit2.Retrofit;
 
 public final class LogInActivity extends BaseActivityDi implements HasFragmentInjector {
 
@@ -95,7 +90,7 @@ public final class LogInActivity extends BaseActivityDi implements HasFragmentIn
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
         if (account != null)
-            startChatControlActivity(userManager.getCurrentUser().getEmailPrefix());
+            startChatControlActivity(userManager.getCurrentUser().getName());
 
         UiUtils.replaceFragmentNoTag(getFragmentManager(),
                                      R.id.flBaseContainer,

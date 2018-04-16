@@ -31,9 +31,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.data.model;
+package com.android.virgilsecurity.jwtworkexample.data.model.response;
 
-public interface User {
+import com.android.virgilsecurity.jwtworkexample.data.model.Response;
+import com.android.virgilsecurity.jwtworkexample.data.model.ResponseType;
+import com.google.gson.annotations.SerializedName;
 
-    String getName();
+/**
+ * .._  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/16/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
+ */
+public final class DefaultResponse<T> implements Response {
+
+    @SerializedName("type")
+    private String type;
+
+    @SerializedName("responseObject")
+    private T responseObject;
+
+    public DefaultResponse(ResponseType type, T responseObject) {
+        this.type = type.getType();
+        this.responseObject = responseObject;
+    }
+
+    @Override public String getType() {
+        return type;
+    }
+
+    @Override public T getResponseObject() {
+        return responseObject;
+    }
 }

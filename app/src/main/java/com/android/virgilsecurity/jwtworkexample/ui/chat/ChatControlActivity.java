@@ -44,10 +44,7 @@ import android.view.Gravity;
 import android.widget.TextView;
 
 import com.android.virgilsecurity.jwtworkexample.R;
-import com.android.virgilsecurity.jwtworkexample.data.local.PropertyManager;
 import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
-import com.android.virgilsecurity.jwtworkexample.di.InjectionConstants;
-import com.android.virgilsecurity.jwtworkexample.ui.base.BaseActivity;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseActivityDi;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.thread.ThreadFragment;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.threadList.ThreadsListFragment;
@@ -60,8 +57,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -134,19 +129,24 @@ public class ChatControlActivity extends BaseActivityDi implements HasFragmentIn
         changeFragment(ChatState.THREADS_LIST);
 
         hideKeyboard();
-        showHamburger(true, view -> {
-            if (!dlDrawer.isDrawerOpen(Gravity.START))
-                dlDrawer.openDrawer(Gravity.START);
-            else
-                dlDrawer.closeDrawer(Gravity.START);
-        });
     }
 
     public void changeFragment(@ChatState String tag) {
         if (tag.equals(ChatState.THREADS_LIST)) {
+            showBackButton(false, (view) -> onBackPressed());
+            showHamburger(true, view -> {
+                if (!dlDrawer.isDrawerOpen(Gravity.START))
+                    dlDrawer.openDrawer(Gravity.START);
+                else
+                    dlDrawer.closeDrawer(Gravity.START);
+            });
+
             UiUtils.hideFragment(getFragmentManager(), threadFragment);
             UiUtils.showFragment(getFragmentManager(), threadsListFragment);
         } else {
+            showBackButton(true, (view) -> onBackPressed());
+            showHamburger(false, (view) -> {});
+
             UiUtils.hideFragment(getFragmentManager(), threadsListFragment);
             UiUtils.showFragment(getFragmentManager(), threadFragment);
         }
@@ -157,7 +157,7 @@ public class ChatControlActivity extends BaseActivityDi implements HasFragmentIn
                 nvNavigation.getHeaderView(0)
                             .findViewById(R.id.tvUsernameDrawer);
         tvUsernameDrawer.setText(userManager.getCurrentUser()
-                                            .getEmailPrefix());
+                                            .getName());
 
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -193,6 +193,11 @@ public class ChatControlActivity extends BaseActivityDi implements HasFragmentIn
     }
 
     @Override public void onBackPressed() {
+
+        if (threadFragment.isVisible()) {
+            changeFragment(ChatState.THREADS_LIST);
+            return;
+        }
 
         if (secondPress)
             super.onBackPressed();

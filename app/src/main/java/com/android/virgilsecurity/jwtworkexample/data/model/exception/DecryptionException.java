@@ -31,9 +31,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.data.model;
+package com.android.virgilsecurity.jwtworkexample.data.model.exception;
 
-public interface User {
+/**
+ * . _  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/16/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
+ */
+public class DecryptionException extends RuntimeException {
 
-    String getName();
+    public DecryptionException() {
+    }
+
+    public DecryptionException(String message) {
+        super(message);
+    }
+
+    public DecryptionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DecryptionException(Throwable cause) {
+        super(cause);
+    }
+
+    public DecryptionException(String message,
+                               Throwable cause,
+                               boolean enableSuppression,
+                               boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

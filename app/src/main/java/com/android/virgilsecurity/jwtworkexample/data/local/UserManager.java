@@ -37,7 +37,7 @@ import android.content.Context;
 
 import com.android.virgilsecurity.jwtworkexample.data.model.GoogleToken;
 import com.android.virgilsecurity.jwtworkexample.data.model.Token;
-import com.android.virgilsecurity.jwtworkexample.data.model.User;
+import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
 import com.google.gson.Gson;
 import com.virgilsecurity.sdk.cards.Card;
 
@@ -57,16 +57,16 @@ public class UserManager extends PropertyManager {
     }
 
 
-    public void setCurrentUser(User user) {
+    public void setCurrentUser(DefaultUser user) {
         setValue(CURRENT_USER, new Gson().toJson(user));
     }
 
-    public User getCurrentUser() {
+    public DefaultUser getCurrentUser() {
         return new Gson().fromJson(
                 (String) getValue(CURRENT_USER,
                                   PropertyManager.SupportedTypes.STRING,
                                   null),
-                User.class);
+                DefaultUser.class);
     }
 
     public void clearCurrentUser() {
@@ -95,7 +95,7 @@ public class UserManager extends PropertyManager {
         setValue(GOOGLE_TOKEN, new Gson().toJson(token));
     }
 
-    public Token getGoogleToken() {
+    public GoogleToken getGoogleToken() {
         return new Gson().fromJson(
                 (String) getValue(GOOGLE_TOKEN,
                                   SupportedTypes.STRING,

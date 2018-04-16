@@ -38,9 +38,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringDef;
 
-import com.android.virgilsecurity.jwtworkexample.data.model.User;
-import com.google.gson.Gson;
-
 /**
  * Created by Danylo Oliinyk on 3/23/18 at Virgil Security.
  * -__o

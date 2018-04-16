@@ -31,12 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.data.remote;
-
-import com.appunite.websocket.rx.RxWebSockets;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+package com.android.virgilsecurity.jwtworkexample.data.model.exception;
 
 /**
  * . _  _
@@ -44,19 +39,31 @@ import okhttp3.Request;
  * -| || || |   Created by:
  * .| || || |-  Danylo Oliinyk
  * ..\_  || |   on
- * ....|  _/    3/28/18
+ * ....|  _/    4/16/18
  * ...-| | \    at Virgil Security
  * ....|_|-
  */
-public class WebSocketHelper {
+public class MultiplyCardsException extends RuntimeException {
 
-    private final RxWebSockets socket;
+    public MultiplyCardsException() {
+    }
 
-    public WebSocketHelper(OkHttpClient httpClient) {
-        socket = new RxWebSockets(httpClient,
-                                  new Request.Builder()
-                                          .get()
-                                          .url("") // FIXME: 3/28/18 add URL
-                                          .build());
+    public MultiplyCardsException(String message) {
+        super(message);
+    }
+
+    public MultiplyCardsException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public MultiplyCardsException(Throwable cause) {
+        super(cause);
+    }
+
+    public MultiplyCardsException(String message,
+                                  Throwable cause,
+                                  boolean enableSuppression,
+                                  boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

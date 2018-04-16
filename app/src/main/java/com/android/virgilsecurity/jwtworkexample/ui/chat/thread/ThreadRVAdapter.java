@@ -41,26 +41,31 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.virgilsecurity.jwtworkexample.R;
+import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
 import com.android.virgilsecurity.jwtworkexample.data.model.Message;
-import com.android.virgilsecurity.jwtworkexample.ui.chat.threadList.ChatThreadsAdapter;
-import com.virgilsecurity.sdk.client.exceptions.VirgilKeyIsNotFoundException;
-import com.virgilsecurity.sdk.crypto.PrivateKey;
-import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
-import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by Danylo Oliinyk on 3/27/18 at Virgil Security.
- * -__o
+ * . _  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/16/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
 
-public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.MessageViewHolder> {
+public class ThreadRVAdapter extends RecyclerView.Adapter<ThreadRVAdapter.HolderMessage> {
 
     @IntDef({MessageType.ME, MessageType.YOU})
     private @interface MessageType {
@@ -68,44 +73,53 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.MessageVie
         int YOU = 1;
     }
 
+    private final VirgilHelper virgilHelper;
+    private final UserManager userManager;
     private List<Message> items;
 
-    ThreadAdapter() {
+    @Inject
+    ThreadRVAdapter(VirgilHelper virgilHelper,
+                    UserManager userManager) {
+        this.virgilHelper = virgilHelper;
+        this.userManager = userManager;
+
+        items = Collections.emptyList();
     }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        MessageViewHolder viewHolder;
+    public HolderMessage onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        HolderMessage viewHolder;
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
 
         switch (viewType) {
             case MessageType.ME:
-                viewHolder = new MessageViewHolder(inflater.inflate(R.layout.layout_holder_me,
-                                                                    viewGroup,
-                                                                    false));
+                viewHolder = new HolderMessage(inflater.inflate(R.layout.layout_holder_me,
+                                                                viewGroup,
+                                                                false));
                 break;
             case MessageType.YOU:
-                viewHolder = new MessageViewHolder(inflater.inflate(R.layout.layout_holder_you,
-                                                                    viewGroup,
-                                                                    false));
+                viewHolder = new HolderMessage(inflater.inflate(R.layout.layout_holder_you,
+                                                                viewGroup,
+                                                                false));
                 break;
             default:
-                viewHolder = new MessageViewHolder(inflater.inflate(R.layout.layout_holder_me,
-                                                                    viewGroup,
-                                                                    false));
+                viewHolder = new HolderMessage(inflater.inflate(R.layout.layout_holder_me,
+                                                                viewGroup,
+                                                                false));
                 break;
         }
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(MessageViewHolder viewHolder, int position) {
-        viewHolder.bind(items.get(position));
+    public void onBindViewHolder(HolderMessage viewHolder, int position) {
+        viewHolder.bind(virgilHelper.decrypt(items.get(position).getText().getBytes()));
     }
 
     @Override public int getItemViewType(int position) {
-        if (items.get(position).getSender()
-                 .equals("")) { // FIXME: 3/27/18 get current user
+        if (items.get(position)
+                 .getSender()
+                 .equals(userManager.getCurrentUser().getName())) {
             return MessageType.ME;
         } else {
             return MessageType.YOU;
@@ -117,59 +131,33 @@ public class ThreadAdapter extends RecyclerView.Adapter<ThreadAdapter.MessageVie
     }
 
     void setItems(List<Message> items) {
-        if (items != null) {
+        if (items != null)
             this.items = new ArrayList<>(items);
-        } else {
+        else
             this.items = Collections.emptyList();
-        }
+
         notifyDataSetChanged();
     }
 
-    void addItems(List<Message> items) {
-        this.items.addAll(items);
-        notifyDataSetChanged();
-    }
-
-    void addItem(int position, Message item) {
+    void addItem(Message item) {
         if (items == null)
             items = new ArrayList<>();
 
-        items.add(position, item);
+        items.add(item);
         notifyDataSetChanged();
     }
 
-    static class MessageViewHolder extends RecyclerView.ViewHolder {
-
-        private PrivateKey privateKey;
+    static class HolderMessage extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tvMessage) TextView tvMessage;
 
-        MessageViewHolder(View v) {
+        HolderMessage(View v) {
             super(v);
             ButterKnife.bind(this, v);
-
-            privateKey = new VirgilPrivateKey(); // FIXME: 3/27/18 load user's key
         }
 
-        void bind(Message message) {
-            tvMessage.setText(decrypt(message.getText()));
-        }
-
-        /**
-         * Decrypt data
-         *
-         * @param text to encrypt
-         * @return decrypted data
-         */
-        String decrypt(String text) {
-//            try {
-//                return privateKey.decrypt(text)
-//                                .toString();
-//            } catch (CryptoException e) {
-//                e.printStackTrace();
-//                return "";
-//            }
-            return "";
+        void bind(String message) {
+            tvMessage.setText(message);
         }
     }
 }

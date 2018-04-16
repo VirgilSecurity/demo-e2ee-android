@@ -31,32 +31,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.data.remote;
-
-import com.android.virgilsecurity.jwtworkexample.data.model.TokenResponse;
-import com.android.virgilsecurity.jwtworkexample.data.model.UsersRepsonse;
-
-import io.reactivex.Single;
-import retrofit2.Retrofit;
+package com.android.virgilsecurity.jwtworkexample.data.model;
 
 /**
- * Created by Danylo Oliinyk on 3/23/18 at Virgil Security.
- * -__o
+ * .._  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/16/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
+public enum ResponseType {
 
-public class RxServiceHelper {
+    USERS_LIST("usersList"),
+    MESSAGE("message");
 
-    private JwtExampleService service;
+    private final String type;
 
-    public RxServiceHelper(Retrofit retrofit) {
-        this.service = retrofit.create(JwtExampleService.class);
+    ResponseType(String type) {
+        this.type = type;
     }
 
-    public Single<UsersRepsonse> getUsers() {
-        return service.getUsersRx();
-    }
-
-    public Single<TokenResponse> getToken(String googleToken) {
-        return service.getTokenRx(googleToken);
+    public String getType() {
+        return type;
     }
 }

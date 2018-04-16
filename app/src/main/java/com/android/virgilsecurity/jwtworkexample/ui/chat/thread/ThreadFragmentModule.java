@@ -34,6 +34,7 @@
 package com.android.virgilsecurity.jwtworkexample.ui.chat.thread;
 
 import dagger.Module;
+import dagger.Provides;
 
 /**
  * . _  _

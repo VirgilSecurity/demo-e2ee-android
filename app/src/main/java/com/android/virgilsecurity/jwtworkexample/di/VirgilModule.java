@@ -33,9 +33,7 @@
 
 package com.android.virgilsecurity.jwtworkexample.di;
 
-import com.android.virgilsecurity.jwtworkexample.data.local.PropertyManager;
 import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
-import com.android.virgilsecurity.jwtworkexample.data.remote.RxServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.data.virgil.GetTokenCallbackImpl;
 import com.android.virgilsecurity.jwtworkexample.data.virgil.VirgilHelper;
@@ -121,12 +119,16 @@ public class VirgilModule {
                                                ModelSigner modelSigner,
                                                CardCrypto cardCrypto,
                                                AccessTokenProvider tokenProvider,
-                                               CardVerifier cardVerifier) {
+                                               CardVerifier cardVerifier,
+                                               PrivateKeyStorage privateKeyStorage,
+                                               UserManager userManager) {
         return new VirgilHelper(() -> cardClient,
                                 () -> modelSigner,
                                 () -> cardCrypto,
                                 () -> tokenProvider,
-                                () -> cardVerifier);
+                                () -> cardVerifier,
+                                () -> privateKeyStorage,
+                                () -> userManager);
     }
 
     @Provides @Singleton static VirgilRx provideVirgilRx(VirgilHelper virgilHelper) {

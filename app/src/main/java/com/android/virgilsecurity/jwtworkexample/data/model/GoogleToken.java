@@ -47,7 +47,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class GoogleToken implements Token {
 
-    @SerializedName("token")
+    @SerializedName("google_token")
     private final String token;
 
     public GoogleToken(String token) {

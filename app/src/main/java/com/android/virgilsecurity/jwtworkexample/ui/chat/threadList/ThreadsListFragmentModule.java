@@ -34,6 +34,7 @@
 package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
 
 import dagger.Module;
+import dagger.Provides;
 
 /**
  * . _  _
@@ -48,4 +49,8 @@ import dagger.Module;
 
 @Module
 public class ThreadsListFragmentModule {
+
+    @Provides ThreadsListRVAdapter providesThreadsListRVAdapter() {
+        return new ThreadsListRVAdapter();
+    }
 }

@@ -40,8 +40,9 @@ import android.os.Bundle;
 import com.android.virgilsecurity.jwtworkexample.R;
 import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
 import com.android.virgilsecurity.jwtworkexample.data.model.GoogleToken;
-import com.android.virgilsecurity.jwtworkexample.data.model.Token;
-import com.android.virgilsecurity.jwtworkexample.data.model.User;
+import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
+import com.android.virgilsecurity.jwtworkexample.data.model.exception.MultiplyCardsException;
+import com.android.virgilsecurity.jwtworkexample.data.model.exception.ServiceException;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
 import com.android.virgilsecurity.jwtworkexample.util.ErrorResolver;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
@@ -134,11 +135,11 @@ public final class LogInFragment
 
             UiUtils.toast(this, "Signed In as " + account.getDisplayName());
 
-            User user = new User(account.getEmail());
+            DefaultUser user = new DefaultUser(account.getEmail().split("@")[0]);
             userManager.setCurrentUser(user);
             userManager.setGoogleToken(new GoogleToken(account.getIdToken()));
 
-            presenter.requestSearchCards(user.getEmailPrefix());
+            presenter.requestSearchCards(user.getName());
         } catch (ApiException ignored) {
             UiUtils.toast(this, "Error\nCode: " + ignored.getStatusCode()
                     + "\nMessage: " + ignored.getMessage());
@@ -149,25 +150,38 @@ public final class LogInFragment
         if (cards.size() > 1) {
             presenter.disposeAll();
             UiUtils.toast(this, R.string.multiply_cards);
+            throw new MultiplyCardsException("LogInFragment -> more than 1 card present " +
+                                                     "after search for current identity");
         }
 
         presenter.requestIfKeyExists(cards.get(0).getIdentity());
     }
 
     @SuppressLint("RestrictedApi") @Override public void onSearchCardError(Throwable t) {
-        String error = errorResolver.resolve(t, resolvedError -> null); // If we can't resolve error here -
-                                                                        // then it's normal behaviour. Proceed.
+        String error = errorResolver.resolve(t, resolvedError -> {
+            if (t instanceof ServiceException)
+                return t.getMessage();
+
+            return null;
+        }); // If we can't resolve error here -
+        // then it's normal behaviour. Proceed.
         if (error != null) {
             UiUtils.toast(this, error);
             googleSignInClient.signOut();
+            presenter.disposeAll();
+
+            return;
         }
 
-        presenter.requestPublishCard(userManager.getCurrentUser().getEmailPrefix());
+        presenter.requestPublishCard(userManager.getCurrentUser()
+                                                .getName());
     }
 
     @Override public void onPublishCardSuccess(Card card) {
         userManager.setUserCard(card);
-        activity.startChatControlActivity(userManager.getCurrentUser().getEmailPrefix());
+        activity.startChatControlActivity(userManager.getCurrentUser()
+                                                     .getName());
+
     }
 
     @Override public void onPublishCardError(Throwable t) {
@@ -175,14 +189,16 @@ public final class LogInFragment
     }
 
     @Override public void onKeyExists() {
-        activity.startChatControlActivity(userManager.getCurrentUser().getEmailPrefix());
+        activity.startChatControlActivity(userManager.getCurrentUser()
+                                                     .getName());
     }
 
     @Override public void onKeyNotExists() {
         presenter.disposeAll();
-        UiUtils.toast(this, R.string.no_private_key); // TODO: 3/28/18 add dialog with explanation that
-                                                               //               user can sign in again but won't
-                                                               //               be able to decrypt old messages
+        UiUtils.toast(this,
+                      R.string.no_private_key); // TODO: 3/28/18 add dialog with explanation that
+        //               user can sign in again but won't
+        //               be able to decrypt old messages
     }
 
     @Override public void onStop() {

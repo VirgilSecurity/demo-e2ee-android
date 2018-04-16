@@ -33,11 +33,26 @@
 
 package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
 
-import android.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.android.virgilsecurity.jwtworkexample.R;
+import com.android.virgilsecurity.jwtworkexample.data.model.ResponseType;
+import com.android.virgilsecurity.jwtworkexample.data.model.response.DefaultResponse;
+import com.android.virgilsecurity.jwtworkexample.data.model.response.UsersResponse;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
+import com.android.virgilsecurity.jwtworkexample.util.SerializationUtils;
+import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
+import com.appunite.websocket.rx.RxWebSockets;
+import com.appunite.websocket.rx.messages.RxEventStringMessage;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
 
 /**
  * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
@@ -46,13 +61,48 @@ import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
 
 public class ThreadsListFragment extends BaseFragmentDi<ChatControlActivity> {
 
+    @Inject protected RxWebSockets rxWebSockets;
+    @Inject protected ThreadsListRVAdapter adapter;
+
+    @BindView(R.id.rvContacts) protected RecyclerView rvContacts;
+
     @Override protected int getLayout() {
         return R.layout.fragment_threads_list;
     }
 
     @Override protected void postButterInit() {
+        rxWebSockets.webSocketObservable()
+                    .subscribe(rxEvent -> {
+                        if (rxEvent instanceof RxEventStringMessage) {
+                            JsonObject jsonObject =
+                                    SerializationUtils.fromJson(((RxEventStringMessage) rxEvent).message(),
+                                                                JsonObject.class);
 
+                            if (jsonObject.get("type")
+                                          .getAsString()
+                                          .equals(ResponseType.USERS_LIST.getType())) {
+                                UsersResponse usersResponse =
+                                        SerializationUtils.fromJson(jsonObject.get("responseObject")
+                                                                              .toString(),
+                                                                    UsersResponse.class);
+
+                                activity.runOnUiThread(() -> {
+                                    adapter.setItems(usersResponse.getUsers());
+                                    activity.showBaseLoading(false);
+                                });
+                            }
+                        }
+                    });
+
+        adapter.setClickListener((position, thread) -> {
+            activity.changeFragment(ChatControlActivity.ChatState.THREAD);
+        });
+        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        layoutManager.setReverseLayout(true);
+        rvContacts.setLayoutManager(layoutManager);
+        rvContacts.setAdapter(adapter);
     }
+
 
     public void disposeAll() {
 
