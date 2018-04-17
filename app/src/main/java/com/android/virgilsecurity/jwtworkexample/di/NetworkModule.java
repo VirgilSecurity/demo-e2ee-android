@@ -34,6 +34,7 @@
 package com.android.virgilsecurity.jwtworkexample.di;
 
 import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
+import com.android.virgilsecurity.jwtworkexample.data.remote.WebSocketHelper;
 import com.android.virgilsecurity.jwtworkexample.ui.login.LogInActivityComponent;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
 import com.appunite.websocket.rx.RxWebSockets;
@@ -89,5 +90,9 @@ public class NetworkModule {
                                         .get()
                                         .url("ws://10.0.2.2:7070/chat") // FIXME: 3/28/18 change URL to remote
                                         .build());
+    }
+
+    @Provides @Singleton static WebSocketHelper provideWebSocketHelper(RxWebSockets rxWebSockets) {
+        return new WebSocketHelper(rxWebSockets);
     }
 }

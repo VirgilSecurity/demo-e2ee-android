@@ -44,6 +44,7 @@ import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
 import com.android.virgilsecurity.jwtworkexample.data.model.exception.MultiplyCardsException;
 import com.android.virgilsecurity.jwtworkexample.data.model.exception.ServiceException;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
+import com.android.virgilsecurity.jwtworkexample.ui.login.dialog.NewKeyDialog;
 import com.android.virgilsecurity.jwtworkexample.util.ErrorResolver;
 import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -140,9 +141,9 @@ public final class LogInFragment
             userManager.setGoogleToken(new GoogleToken(account.getIdToken()));
 
             presenter.requestSearchCards(user.getName());
-        } catch (ApiException ignored) {
-            UiUtils.toast(this, "Error\nCode: " + ignored.getStatusCode()
-                    + "\nMessage: " + ignored.getMessage());
+        } catch (ApiException e) {
+            UiUtils.toast(this, "Error\nCode: " + e.getStatusCode()
+                    + "\nMessage: " + e.getMessage());
         }
     }
 
@@ -195,10 +196,15 @@ public final class LogInFragment
 
     @Override public void onKeyNotExists() {
         presenter.disposeAll();
-        UiUtils.toast(this,
-                      R.string.no_private_key); // TODO: 3/28/18 add dialog with explanation that
-        //               user can sign in again but won't
-        //               be able to decrypt old messages
+        NewKeyDialog newKeyDialog = new NewKeyDialog(activity,
+                                                     R.style.NotTransBtnsDialogTheme,
+                                                     getString(R.string.new_keys),
+                                                     getString(R.string.outdate_old_card));
+
+        newKeyDialog.setOnNewKeysDialogListener(() -> {
+            presenter.requestPublishCard(userManager.getCurrentUser()
+                                                    .getName());
+        });
     }
 
     @Override public void onStop() {

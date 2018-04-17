@@ -31,15 +31,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
+package com.android.virgilsecurity.jwtworkexample.ui.chat.thread;
 
-import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
-import com.android.virgilsecurity.jwtworkexample.ui.chat.DataReceivedInteractor;
+import com.virgilsecurity.sdk.cards.Card;
 
 import java.util.List;
-
-import dagger.Module;
-import dagger.Provides;
 
 /**
  * . _  _
@@ -47,20 +43,13 @@ import dagger.Provides;
  * -| || || |   Created by:
  * .| || || |-  Danylo Oliinyk
  * ..\_  || |   on
- * ....|  _/    4/13/18
+ * ....|  _/    4/17/18
  * ...-| | \    at Virgil Security
  * ....|_|-
  */
+public interface SearchCardsInteractor {
 
-@Module
-public class ThreadsListFragmentModule {
+    void onSearchSuccess(List<Card> cards);
 
-    @Provides ThreadsListRVAdapter providesThreadsListRVAdapter() {
-        return new ThreadsListRVAdapter();
-    }
-
-    @Provides DataReceivedInteractor<List<DefaultUser>> providesDataReceivedInteractor(
-            ThreadsListFragment threadsListFragment) {
-        return threadsListFragment;
-    }
+    void onSearchError(Throwable t);
 }

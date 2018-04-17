@@ -113,7 +113,7 @@ public class ThreadRVAdapter extends RecyclerView.Adapter<ThreadRVAdapter.Holder
 
     @Override
     public void onBindViewHolder(HolderMessage viewHolder, int position) {
-        viewHolder.bind(virgilHelper.decrypt(items.get(position).getText().getBytes()));
+        viewHolder.bind(virgilHelper.decrypt(items.get(position).getText()));
     }
 
     @Override public int getItemViewType(int position) {

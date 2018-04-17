@@ -33,6 +33,8 @@
 
 package com.android.virgilsecurity.jwtworkexample.di;
 
+import android.content.Context;
+
 import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
 import com.android.virgilsecurity.jwtworkexample.data.remote.ServiceHelper;
 import com.android.virgilsecurity.jwtworkexample.data.virgil.GetTokenCallbackImpl;
@@ -100,8 +102,8 @@ public class VirgilModule {
         return new VirgilPrivateKeyExporter();
     }
 
-    @Provides @Singleton static KeyStorage provideKeyStorage() {
-        return new JsonFileKeyStorage();
+    @Provides @Singleton static KeyStorage provideKeyStorage(Context context) {
+        return new JsonFileKeyStorage(context.getFilesDir().getAbsolutePath());
     }
 
     @Provides @Singleton static PrivateKeyStorage providePrivateKeyStorage(

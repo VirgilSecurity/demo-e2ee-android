@@ -66,6 +66,17 @@ public class VirgilRx {
         });
     }
 
+    public Single<Card> publishAndoutdateCard(String identity, String previousCardId) {
+        return Single.create(e -> {
+            try {
+                e.onSuccess(virgilHelper.outdateCard(identity, previousCardId));
+            } catch (CryptoException | VirgilServiceException exception) {
+                exception.printStackTrace();
+                e.onError(exception);
+            }
+        });
+    }
+
     public Single<Card> getCard(String cardId) {
         return Single.create(e -> {
             try {

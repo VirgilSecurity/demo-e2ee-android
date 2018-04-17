@@ -132,6 +132,10 @@ public class ChatControlActivity extends BaseActivityDi implements HasFragmentIn
     }
 
     public void changeFragment(@ChatState String tag) {
+        changeFragmentWithData(tag, null);
+    }
+
+    public void changeFragmentWithData(@ChatState String tag, @Nullable String data) {
         if (tag.equals(ChatState.THREADS_LIST)) {
             showBackButton(false, (view) -> onBackPressed());
             showHamburger(true, view -> {
@@ -144,12 +148,19 @@ public class ChatControlActivity extends BaseActivityDi implements HasFragmentIn
             UiUtils.hideFragment(getFragmentManager(), threadFragment);
             UiUtils.showFragment(getFragmentManager(), threadsListFragment);
         } else {
+            if (data != null)
+                threadFragment.setInterlocutorName(data);
+
             showBackButton(true, (view) -> onBackPressed());
             showHamburger(false, (view) -> {});
 
             UiUtils.hideFragment(getFragmentManager(), threadsListFragment);
             UiUtils.showFragment(getFragmentManager(), threadFragment);
         }
+    }
+
+    public void changeToolbarTitleExposed(String text) {
+        changeToolbarTitle(text);
     }
 
     private void initDrawer() {
@@ -195,7 +206,7 @@ public class ChatControlActivity extends BaseActivityDi implements HasFragmentIn
     @Override public void onBackPressed() {
 
         if (threadFragment.isVisible()) {
-            changeFragment(ChatState.THREADS_LIST);
+            changeFragmentWithData(ChatState.THREADS_LIST, getString(R.string.threads_list_name));
             return;
         }
 

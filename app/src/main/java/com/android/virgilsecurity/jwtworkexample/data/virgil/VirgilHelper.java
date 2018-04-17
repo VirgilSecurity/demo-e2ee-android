@@ -48,7 +48,9 @@ import com.virgilsecurity.sdk.crypto.VirgilCardCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.VirgilKeyPair;
 import com.virgilsecurity.sdk.crypto.VirgilPrivateKey;
+import com.virgilsecurity.sdk.crypto.VirgilPublicKey;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
+import com.virgilsecurity.sdk.crypto.exceptions.EncryptionException;
 import com.virgilsecurity.sdk.jwt.contract.AccessTokenProvider;
 import com.virgilsecurity.sdk.storage.PrivateKeyStorage;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
@@ -97,6 +99,18 @@ public class VirgilHelper {
         return cardManager.publishCard(cardModel);
     }
 
+    public Card outdateCard(String identity, String previousCardId) throws CryptoException, VirgilServiceException {
+        VirgilKeyPair keyPair = generateKeyPair();
+
+        privateKeyStorage.store(keyPair.getPrivateKey(), identity, null);
+
+        RawSignedModel cardModel = cardManager.generateRawCard(keyPair.getPrivateKey(),
+                                                               keyPair.getPublicKey(),
+                                                               identity,
+                                                               previousCardId);
+        return cardManager.publishCard(cardModel);
+    }
+
     public Card getCard(String cardId) throws CryptoException, VirgilServiceException {
         return cardManager.getCard(cardId);
     }
@@ -114,18 +128,35 @@ public class VirgilHelper {
         }
     }
 
-    public String decrypt(byte[] cipherData) {
+    public String decrypt(String text) {
+        byte[] cipherData = ConvertionUtils.toBytes(text);
+
         try {
             byte[] decryptedData =
                     getVirgilCrypto().decrypt(cipherData,
                                               (VirgilPrivateKey) privateKeyStorage.load(
                                                       userManager.getCurrentUser()
-                                                                 .getName()).getLeft());
+                                                                 .getName())
+                                                                                  .getLeft());
             return ConvertionUtils.toString(decryptedData);
         } catch (CryptoException e) {
             e.printStackTrace();
             throw new DecryptionException("Failed to decrypt data ):");
         }
+    }
+
+    public String encrypt(String data, List<VirgilPublicKey> publicKeys) {
+        byte[] toEncrypt = ConvertionUtils.toBytes(data);
+        byte[] encryptedData;
+        try {
+            encryptedData = getVirgilCrypto().encrypt(toEncrypt, publicKeys);
+        } catch (EncryptionException e) {
+            e.printStackTrace();
+            throw new com.android.virgilsecurity.jwtworkexample.data.model.exception.EncryptionException(
+                    "Failed to decrypt data ):");
+        }
+
+        return ConvertionUtils.toString(encryptedData);
     }
 
     public VirgilCrypto getVirgilCrypto() {
@@ -135,6 +166,8 @@ public class VirgilHelper {
     public CardManager getCardManager() {
         return cardManager;
     }
+
+
 
     public interface InitCardClient {
         CardClient initialize();

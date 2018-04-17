@@ -52,6 +52,16 @@ import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasFragmentInjector;
 
+/**
+ * . _  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/13/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
+ */
 public final class LogInActivity extends BaseActivityDi implements HasFragmentInjector {
 
     @Inject protected DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;

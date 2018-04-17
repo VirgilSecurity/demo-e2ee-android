@@ -31,15 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
-
-import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
-import com.android.virgilsecurity.jwtworkexample.ui.chat.DataReceivedInteractor;
-
-import java.util.List;
-
-import dagger.Module;
-import dagger.Provides;
+package com.android.virgilsecurity.jwtworkexample.data.model.exception;
 
 /**
  * . _  _
@@ -47,20 +39,31 @@ import dagger.Provides;
  * -| || || |   Created by:
  * .| || || |-  Danylo Oliinyk
  * ..\_  || |   on
- * ....|  _/    4/13/18
+ * ....|  _/    4/16/18
  * ...-| | \    at Virgil Security
  * ....|_|-
  */
+public class EncryptionException extends RuntimeException {
 
-@Module
-public class ThreadsListFragmentModule {
-
-    @Provides ThreadsListRVAdapter providesThreadsListRVAdapter() {
-        return new ThreadsListRVAdapter();
+    public EncryptionException() {
     }
 
-    @Provides DataReceivedInteractor<List<DefaultUser>> providesDataReceivedInteractor(
-            ThreadsListFragment threadsListFragment) {
-        return threadsListFragment;
+    public EncryptionException(String message) {
+        super(message);
+    }
+
+    public EncryptionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public EncryptionException(Throwable cause) {
+        super(cause);
+    }
+
+    public EncryptionException(String message,
+                               Throwable cause,
+                               boolean enableSuppression,
+                               boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

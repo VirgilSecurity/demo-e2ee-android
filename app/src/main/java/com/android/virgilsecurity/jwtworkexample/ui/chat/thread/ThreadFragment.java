@@ -33,73 +33,236 @@
 
 package com.android.virgilsecurity.jwtworkexample.ui.chat.thread;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.android.virgilsecurity.jwtworkexample.R;
+import com.android.virgilsecurity.jwtworkexample.data.local.UserManager;
 import com.android.virgilsecurity.jwtworkexample.data.model.DefaultMessage;
-import com.android.virgilsecurity.jwtworkexample.data.model.ResponseType;
-import com.android.virgilsecurity.jwtworkexample.data.model.response.DefaultResponse;
-import com.android.virgilsecurity.jwtworkexample.data.model.response.UsersResponse;
+import com.android.virgilsecurity.jwtworkexample.data.model.Message;
+import com.android.virgilsecurity.jwtworkexample.data.model.exception.MultiplyCardsException;
+import com.android.virgilsecurity.jwtworkexample.data.model.exception.ServiceException;
 import com.android.virgilsecurity.jwtworkexample.ui.base.BaseFragmentDi;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.ChatControlActivity;
-import com.android.virgilsecurity.jwtworkexample.util.SerializationUtils;
-import com.appunite.websocket.rx.RxWebSockets;
-import com.appunite.websocket.rx.messages.RxEventStringMessage;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+import com.android.virgilsecurity.jwtworkexample.ui.chat.DataReceivedInteractor;
+import com.android.virgilsecurity.jwtworkexample.util.ErrorResolver;
+import com.android.virgilsecurity.jwtworkexample.util.UiUtils;
+import com.virgilsecurity.sdk.cards.Card;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
  * -__o
  */
 
-public class ThreadFragment extends BaseFragmentDi<ChatControlActivity> {
+public class ThreadFragment extends BaseFragmentDi<ChatControlActivity>
+        implements DataReceivedInteractor<Message>, OnMessageSentInteractor, WebSocketInteractor,
+        SearchCardsInteractor {
 
-    @Inject protected RxWebSockets rxWebSockets;
     @Inject protected ThreadRVAdapter adapter;
+    @Inject protected ThreadFragmentPresenter presenter;
+    @Inject protected ErrorResolver errorResolver;
+    @Inject protected UserManager userManager;
+
+    private String interlocutorName;
+    private Card interlocutorCard;
 
     @BindView(R.id.rvChat) protected RecyclerView rvChat;
+    @BindView(R.id.etMessage) EditText etMessage;
+    @BindView(R.id.btnSend) ImageButton btnSend;
+    @BindView(R.id.tvEmpty) View tvEmpty;
+    @BindView(R.id.tvError) View tvError;
+    @BindView(R.id.pbLoading) View pbLoading;
 
     @Override protected int getLayout() {
         return R.layout.fragment_thread;
     }
 
     @Override protected void postButterInit() {
-        rxWebSockets.webSocketObservable()
-                    .subscribe(rxEvent -> {
-                        if (rxEvent instanceof RxEventStringMessage) {
-                            JsonObject jsonObject =
-                                    SerializationUtils.fromJson(((RxEventStringMessage) rxEvent).message(),
-                                                                JsonObject.class);
-
-                            if (jsonObject.get("type")
-                                          .getAsString()
-                                          .equals(ResponseType.MESSAGE.getType())) {
-                                DefaultMessage message =
-                                        SerializationUtils.fromJson(jsonObject.get("responseObject")
-                                                                              .toString(),
-                                                                    DefaultMessage.class);
-
-                                activity.runOnUiThread(() -> {
-                                    adapter.addItem(message);
-                                    activity.showBaseLoading(false);
-                                });
-                            }
-                        }
-                    });
-
         rvChat.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         layoutManager.setReverseLayout(true);
         rvChat.setLayoutManager(layoutManager);
+        initMessageInput();
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+
+        presenter.turnOnMessageListener();
+    }
+
+    @Override public void onPause() {
+        super.onPause();
+
+        presenter.turnOffMessageListener();
     }
 
     public void disposeAll() {
+        presenter.disposeAll();
+    }
 
+    @Override public void onDataReceived(Message receivedData) {
+        adapter.addItem(receivedData);
+        activity.showBaseLoading(false);
+    }
+
+    @Override public void onConnected() {
+        lockSendUi(false, true);
+        lockSendUi(true, false);
+    }
+
+    @Override public void onDisconnected() {
+        lockSendUi(true, true);
+    }
+
+    @Override
+    public void onSendMessageSuccess() {
+        etMessage.setText("");
+        lockSendUi(false, true);
+        lockSendUi(true, false);
+    }
+
+    @Override
+    public void onSendMessageError(Throwable t) {
+        etMessage.setText("");
+        lockSendUi(false, true);
+        lockSendUi(true, false);
+        UiUtils.toast(this, errorResolver.resolve(t));
+    }
+
+    private void initMessageInput() {
+        etMessage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                lockSendUi(charSequence.toString()
+                                       .isEmpty(), false);
+            }
+
+            @Override public void afterTextChanged(Editable editable) {
+
+            }
+        });
+    }
+
+    private void lockSendUi(boolean lock, boolean lockInput) {
+        if (lock) {
+            btnSend.setEnabled(false);
+            btnSend.setBackground(ContextCompat.getDrawable(activity,
+                                                            R.drawable.bg_btn_chat_send_pressed));
+            if (lockInput) {
+                etMessage.setEnabled(false);
+                InputMethodManager inputManager =
+                        (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                if (inputManager != null)
+                    inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                                                 InputMethodManager.HIDE_IMPLICIT_ONLY);
+            }
+        } else {
+            btnSend.setEnabled(true);
+            btnSend.setBackground(ContextCompat.getDrawable(activity,
+                                                            R.drawable.bg_btn_chat_send));
+            if (lockInput)
+                etMessage.setEnabled(true);
+        }
+    }
+
+    @OnClick({R.id.btnSend}) void onInterfaceClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnSend:
+                String text = etMessage.getText()
+                                          .toString()
+                                          .trim();
+                if (!text.isEmpty()) {
+                    if (interlocutorCard != null) {
+                        lockSendUi(true, true);
+                        sendMessage(text);
+                    } else {
+                        lockSendUi(true, true);
+                        presenter.requestSearchCards(interlocutorName);
+                    }
+                }
+                break;
+        }
+    }
+
+    private void sendMessage(String text) {
+        showProgress(true);
+        Message message = new DefaultMessage(userManager.getCurrentUser()
+                                                        .getName(),
+                                             interlocutorName,
+                                             text);
+
+        presenter.requestSendMessage(interlocutorCard, message);
+    }
+
+    public void setInterlocutorName(@NonNull String interlocutorName) {
+        this.interlocutorName = interlocutorName;
+        activity.changeToolbarTitleExposed(interlocutorName);
+    }
+
+    @Override public void onSearchSuccess(List<Card> cards) {
+        if (cards.size() > 1) {
+            presenter.disposeAll();
+            UiUtils.toast(this, R.string.multiply_cards);
+            throw new MultiplyCardsException("LogInFragment -> more than 1 card present " +
+                                                     "after search for current identity");
+        }
+
+        interlocutorCard = cards.get(0);
+
+        String text = etMessage.getText()
+                               .toString()
+                               .trim();
+
+        if (!text.isEmpty())
+            sendMessage(text);
+
+        lockSendUi(false, true);
+        lockSendUi(true, false);
+        showProgress(false);
+    }
+
+    @Override public void onSearchError(Throwable t) {
+        String error = errorResolver.resolve(t, resolvedError -> {
+            if (t instanceof ServiceException)
+                return t.getMessage();
+
+            return null;
+        }); // If we can't resolve error here -
+        // then it's normal behaviour. Proceed.
+        if (error != null) {
+            UiUtils.toast(this, error);
+            presenter.disposeAll();
+        }
+
+        lockSendUi(false, true);
+        lockSendUi(true, false);
+
+        showProgress(false);
+    }
+
+    private void showProgress(boolean show) {
+        pbLoading.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 }

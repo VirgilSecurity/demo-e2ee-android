@@ -31,7 +31,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
+package com.android.virgilsecurity.jwtworkexample.data.remote;
+
+import com.appunite.websocket.rx.RxWebSockets;
+import com.appunite.websocket.rx.messages.RxEvent;
+import com.appunite.websocket.rx.messages.RxEventStringMessage;
+
+import javax.inject.Inject;
+
+import io.reactivex.disposables.Disposable;
+import rx.Subscription;
 
 /**
  * . _  _
@@ -39,10 +48,39 @@ package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
  * -| || || |   Created by:
  * .| || || |-  Danylo Oliinyk
  * ..\_  || |   on
- * ....|  _/    3/21/18
+ * ....|  _/    4/17/18
  * ...-| | \    at Virgil Security
  * ....|_|-
  */
+public class WebSocketHelper {
 
-public class ThreadsListPresenter {
+    private RxWebSockets rxWebSockets;
+    private OnRxEventListener onMessageReceiveListener;
+    private Subscription webSocketSubscription;
+
+    @Inject
+    public WebSocketHelper(RxWebSockets rxWebSockets) {
+        this.rxWebSockets = rxWebSockets;
+    }
+
+    private void initRxWebSocket() {
+        webSocketSubscription = rxWebSockets.webSocketObservable()
+                                            .subscribe(rxEvent -> {
+                                                if (onMessageReceiveListener != null)
+                                                    onMessageReceiveListener.onRxEvent(rxEvent);
+                                            });
+    }
+
+    public void setOnMessageReceiveListener(OnRxEventListener onMessageReceiveListener) {
+        this.onMessageReceiveListener = onMessageReceiveListener;
+        initRxWebSocket();
+    }
+
+    public void unsubscribe() {
+        webSocketSubscription.unsubscribe();
+    }
+
+    public interface OnRxEventListener {
+        void onRxEvent(RxEvent message);
+    }
 }

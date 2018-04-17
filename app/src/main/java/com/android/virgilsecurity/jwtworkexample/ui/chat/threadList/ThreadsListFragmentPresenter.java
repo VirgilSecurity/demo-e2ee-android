@@ -34,12 +34,18 @@
 package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
 
 import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
+import com.android.virgilsecurity.jwtworkexample.data.model.ResponseType;
+import com.android.virgilsecurity.jwtworkexample.data.model.response.UsersResponse;
+import com.android.virgilsecurity.jwtworkexample.data.remote.WebSocketHelper;
+import com.android.virgilsecurity.jwtworkexample.ui.base.BasePresenter;
 import com.android.virgilsecurity.jwtworkexample.ui.chat.DataReceivedInteractor;
+import com.android.virgilsecurity.jwtworkexample.util.SerializationUtils;
+import com.appunite.websocket.rx.messages.RxEventStringMessage;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 
-import dagger.Module;
-import dagger.Provides;
+import javax.inject.Inject;
 
 /**
  * . _  _
@@ -47,20 +53,45 @@ import dagger.Provides;
  * -| || || |   Created by:
  * .| || || |-  Danylo Oliinyk
  * ..\_  || |   on
- * ....|  _/    4/13/18
+ * ....|  _/    4/17/18
  * ...-| | \    at Virgil Security
  * ....|_|-
  */
+public class ThreadsListFragmentPresenter implements BasePresenter {
 
-@Module
-public class ThreadsListFragmentModule {
+    private WebSocketHelper helper;
+    private DataReceivedInteractor<List<DefaultUser>> onMessageReceivedInteractor;
 
-    @Provides ThreadsListRVAdapter providesThreadsListRVAdapter() {
-        return new ThreadsListRVAdapter();
+    @Inject
+    public ThreadsListFragmentPresenter(WebSocketHelper helper,
+                                        DataReceivedInteractor<List<DefaultUser>> onMessageReceivedInteractor) {
+        this.helper = helper;
+        this.onMessageReceivedInteractor = onMessageReceivedInteractor;
     }
 
-    @Provides DataReceivedInteractor<List<DefaultUser>> providesDataReceivedInteractor(
-            ThreadsListFragment threadsListFragment) {
-        return threadsListFragment;
+    public void requestUsersList() {
+        helper.setOnMessageReceiveListener(rxEvent -> {
+            if (rxEvent instanceof RxEventStringMessage) {
+                JsonObject jsonObject =
+                        SerializationUtils.fromJson(((RxEventStringMessage) rxEvent).message(),
+                                                    JsonObject.class);
+
+                if (jsonObject.get("type")
+                              .getAsString()
+                              .equals(ResponseType.USERS_LIST.getType())) {
+                    UsersResponse usersResponse =
+                            SerializationUtils.fromJson(jsonObject.get("responseObject")
+                                                                  .toString(),
+                                                        UsersResponse.class);
+
+                    onMessageReceivedInteractor.onDataReceived(usersResponse.getUsers());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void disposeAll() {
+        helper.unsubscribe();
     }
 }

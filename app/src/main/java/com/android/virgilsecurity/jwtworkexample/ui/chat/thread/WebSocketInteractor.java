@@ -31,15 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.ui.chat.threadList;
-
-import com.android.virgilsecurity.jwtworkexample.data.model.DefaultUser;
-import com.android.virgilsecurity.jwtworkexample.ui.chat.DataReceivedInteractor;
-
-import java.util.List;
-
-import dagger.Module;
-import dagger.Provides;
+package com.android.virgilsecurity.jwtworkexample.ui.chat.thread;
 
 /**
  * . _  _
@@ -47,20 +39,13 @@ import dagger.Provides;
  * -| || || |   Created by:
  * .| || || |-  Danylo Oliinyk
  * ..\_  || |   on
- * ....|  _/    4/13/18
+ * ....|  _/    4/17/18
  * ...-| | \    at Virgil Security
  * ....|_|-
  */
+public interface WebSocketInteractor {
 
-@Module
-public class ThreadsListFragmentModule {
+    void onConnected();
 
-    @Provides ThreadsListRVAdapter providesThreadsListRVAdapter() {
-        return new ThreadsListRVAdapter();
-    }
-
-    @Provides DataReceivedInteractor<List<DefaultUser>> providesDataReceivedInteractor(
-            ThreadsListFragment threadsListFragment) {
-        return threadsListFragment;
-    }
+    void onDisconnected();
 }

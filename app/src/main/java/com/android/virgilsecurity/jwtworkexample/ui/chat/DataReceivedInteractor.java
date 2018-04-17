@@ -31,12 +31,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.virgilsecurity.jwtworkexample.ui.chat.thread;
+package com.android.virgilsecurity.jwtworkexample.ui.chat;
 
 /**
- * Created by Danylo Oliinyk on 3/21/18 at Virgil Security.
- * -__o
+ * . _  _
+ * .| || | _
+ * -| || || |   Created by:
+ * .| || || |-  Danylo Oliinyk
+ * ..\_  || |   on
+ * ....|  _/    4/17/18
+ * ...-| | \    at Virgil Security
+ * ....|_|-
  */
+public interface DataReceivedInteractor<T> {
 
-public class ThreadPresenter {
+    void onDataReceived(T receivedData);
 }

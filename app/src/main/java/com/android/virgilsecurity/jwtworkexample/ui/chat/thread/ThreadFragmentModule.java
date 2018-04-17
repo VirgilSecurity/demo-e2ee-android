@@ -33,6 +33,9 @@
 
 package com.android.virgilsecurity.jwtworkexample.ui.chat.thread;
 
+import com.android.virgilsecurity.jwtworkexample.data.model.Message;
+import com.android.virgilsecurity.jwtworkexample.ui.chat.DataReceivedInteractor;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -49,4 +52,24 @@ import dagger.Provides;
 
 @Module
 public class ThreadFragmentModule {
+
+    @Provides
+    DataReceivedInteractor<Message> providesDataReceivedInteractor(ThreadFragment threadFragment) {
+         return threadFragment;
+    }
+
+    @Provides
+    WebSocketInteractor providesWebSocketInteractor(ThreadFragment threadFragment) {
+         return threadFragment;
+    }
+
+    @Provides
+    OnMessageSentInteractor providesOnMessageSentInteractor(ThreadFragment threadFragment) {
+         return threadFragment;
+    }
+
+    @Provides
+    SearchCardsInteractor providesSearchCardsInteractor(ThreadFragment threadFragment) {
+         return threadFragment;
+    }
 }
